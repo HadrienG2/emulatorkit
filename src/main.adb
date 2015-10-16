@@ -28,6 +28,8 @@ with Emulator_Kit.CPU.Registers;
 with Emulator_Kit.CPU.Registers.Data;
 with Emulator_Kit.Data_Types;
 with Emulator_Kit.Debug;
+with Emulator_Kit.Debug.Test;
+with Emulator_Kit.Debug.Test;
 with Emulator_Kit.Memory;
 with Emulator_Kit.Memory.Abstract_Memory;
 with Emulator_Kit.Memory.Byte_Buffers;
