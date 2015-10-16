@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
+with Emulator_Kit.Debug.Test;
+
 package body Emulator_Kit.Asynchronous.Processes is
 
    use type Ada.Exceptions.Exception_Id;
@@ -49,5 +51,141 @@ package body Emulator_Kit.Asynchronous.Processes is
       end Wait_For_Completion;
 
    end Process;
+
+   procedure Test is
+      use Emulator_Kit.Debug.Test;
+
+      procedure Test_Process is
+      begin
+         -- Check the normal process workflow
+         declare
+            Proc : Process;
+         begin
+            -- Check initial process state
+            Test_Element_Property (not Proc.Completed, "Processes should not be initially completed");
+            Test_Element_Property (not Proc.Exception_Pending, "Processes should not initially have exceptions");
+            begin
+               Proc.Fetch_Exception;
+            exception
+               when others => Fail_Test ("Fetching exceptions should do nothing initially");
+            end;
+            select
+               Proc.Wait_For_Completion;
+               Fail_Test ("Client should wait for unfinished process when calling Wait_For_Completion");
+            else
+               null;
+            end select;
+
+            -- Check process state after normal completion
+            Proc.Notify_Completion;
+            Test_Element_Property (Proc.Completed, "After completion notification, processes should be completed");
+            Test_Element_Property (not Proc.Exception_Pending, "After completion notification, processes should not have exceptions");
+            begin
+               Proc.Fetch_Exception;
+            exception
+               when others => Fail_Test ("After completion notification, fetching exceptions should do nothing");
+            end;
+            select
+               Proc.Wait_For_Completion;
+            else
+               Fail_Test ("Client should not wait for finished processes");
+            end select;
+         end;
+
+         -- Check the exceptional process workflow
+         declare
+            Proc : Process;
+            Strange_Exception : exception;
+            Strange_Message : constant String := "Strange message";
+         begin
+            -- Raise a process exception
+            begin
+               raise Strange_Exception with Strange_Message;
+            exception
+               when Occurrence : Strange_Exception => Proc.Notify_Exception (Occurrence);
+            end;
+
+            -- Check the resulting process state
+            Test_Element_Property (Proc.Completed, "After exception notification, processes should be completed");
+            Test_Element_Property (Proc.Exception_Pending, "After exception notification, processes should have an exception pending");
+            begin
+               Proc.Fetch_Exception;
+               Fail_Test ("When an exception is pending, Fetch_Exception should trigger it");
+            exception
+               when Occurrence : Strange_Exception =>
+                  Test_Element_Property (Ada.Exceptions.Exception_Message (Occurrence) = Strange_Message,
+                                         "Exception notifications should preserve the exception message");
+               when others =>
+                  Fail_Test ("Exception notifications should preserve the exception type");
+            end;
+            begin
+               select
+                  Proc.Wait_For_Completion;
+                  Fail_Test ("When an exception is pending, Wait_For_Completion should trigger it");
+               else
+                  Fail_Test ("Client should not wait for aborted processes");
+               end select;
+            exception
+               when Occurrence : Strange_Exception =>
+                  Test_Element_Property (Ada.Exceptions.Exception_Message (Occurrence) = Strange_Message,
+                                         "Exception notifications should preserve the exception message");
+               when others =>
+                  Fail_Test ("Exception notifications should preserve the exception type");
+            end;
+         end;
+      end Test_Process;
+
+      procedure Test_Shared_Processes is
+      begin
+         -- Check the uninitialized process handle state
+         begin
+            -- Test single handle behaviour
+            declare
+               Proc_Handle : Process_Handle;
+            begin
+               Test_Element_Property (not Proc_Handle.Is_Valid, "Process handles should be initially invalid");
+               declare
+                  Handle_Target : Process_Access := Proc_Handle.Target with Unreferenced;
+               begin
+                  Fail_Test ("Accessing an invalid handle should trigger an exception");
+               end;
+            exception
+               when Shared_Processes.Invalid_Handle => null;
+               when others => Fail_Test ("Invalid handle access should raise Invalid_Handle");
+            end;
+
+            -- Test copying behaviour
+            declare
+               Proc_Handle_1 : Process_Handle;
+               Proc_Handle_2 : Process_Handle with Unreferenced;
+            begin
+               Proc_Handle_2 := Proc_Handle_1;
+               Fail_Test ("Copying an invalid handle should trigger an exception");
+            exception
+               when Program_Error => null;
+               when others => Fail_Test ("Invalid handle copy should raise Program_Error");
+            end;
+         exception
+            when others => Fail_Test ("Invalid handle finalization should not trigger exceptions");
+         end;
+
+         -- TODO : Check handle initialization, copying behavior, and finalization
+         declare
+            Proc_Handle : Process_Handle := Make_Process;
+      end Test_Shared_Processes;
+
+      procedure Test_Processes_Package is
+      begin
+         Test_Package_Element (To_Entity_Name ("Process"), Test_Process'Access);
+         Test_Package_Element (To_Entity_Name ("Shared_Processes"), Test_Shared_Processes'Access);
+      end Test_Processes_Package;
+   begin
+      Test_Package (To_Entity_Name ("Asynchronous.Processes"), Test_Processes_Package'Access);
+   end Test;
+
+begin
+
+   -- Automatically test the package when it is included
+   Debug.Test.Elaboration_Self_Test (Test'Access);
 
 end Emulator_Kit.Asynchronous.Processes;
