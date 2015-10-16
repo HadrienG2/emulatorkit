@@ -1,6 +1,6 @@
 # EmulatorKit
 
-This project provides a set of Ada 2012 components out of which one can build an x86_64 emulator for the x86_64 architecture. The README file you are currently reading summarizes what we believe is most important for project newcomers, and you can learn more about the project in [its Wiki](https://github.com/Neolander/emulatorkit/wiki).
+This project provides a set of Ada 2012 components out of which one can build an x86_64 emulator that runs on x86_64 hosts. The README file you are currently reading summarizes what we believe is most important for project newcomers, and you can learn more about the project in [its Wiki](https://github.com/Neolander/emulatorkit/wiki).
 
 ## Release model redux
 
@@ -12,9 +12,9 @@ The project uses a three stage rolling release model, inspired by that of Debian
 
 ## Compiler configuration and portability
 
-The main.adb source file gives an example of how to instantiate and use the library. To build this code, you will need a recent release of GNAT, which is distributed either as part of GCC or directly from Adacore at <http://libre.adacore.com>.
+The main.adb source file gives an example of how to use the library. To build this code, you will need a recent release of GNAT, which is distributed either as part of GCC or directly from Adacore at <http://libre.adacore.com>.
 
-Portability to other Ada compilers is not currently envisioned, as we make use of GNAT-specific features such as inline assembly, but we will nonetheless try to stick with standard Ada whenever it does what we want without too much hassle.
+Portability to other Ada compilers is not currently envisioned, as we make use of GNAT-specific features such as inline assembly. We will nonetheless try to stick with standard Ada whenever it does what we want without too much hassle.
 
 We also provide [a gprbuild-compatible project file](https://github.com/Neolander/emulatorkit/blob/unstable/emulatorkit.gpr), which features the recommended compiler switches to build the library.
 
