@@ -1,0 +1,5 @@
+# I cannot include my reference documentation due to copyright issues
+reference/
+
+# I will not include automatically generated files either, that would be wasteful
+obj/
