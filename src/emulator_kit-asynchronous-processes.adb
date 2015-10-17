@@ -166,7 +166,7 @@ package body Emulator_Kit.Asynchronous.Processes is
                when others => Fail_Test ("Invalid handle copy should raise Program_Error");
             end;
          exception
-            when others => Fail_Test ("Invalid handle finalization should not trigger exceptions");
+            when others => Fail_Test ("Invalid handle initialization and finalization should not trigger exceptions");
          end;
 
          -- TODO : Check handle initialization, copying behavior, and finalization
