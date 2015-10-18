@@ -136,6 +136,7 @@ package body Emulator_Kit.Asynchronous.Processes is
       end Test_Process;
 
       procedure Test_Shared_Processes is
+         use type Process_Access;
       begin
          -- Check the uninitialized process handle state
          begin
@@ -145,13 +146,14 @@ package body Emulator_Kit.Asynchronous.Processes is
             begin
                Test_Element_Property (not Proc_Handle.Is_Valid, "Process handles should be initially invalid");
                declare
-                  Handle_Target : Process_Access := Proc_Handle.Target with Unreferenced;
+                  Handle_Target : Process_Access with Unreferenced;
                begin
+                  Handle_Target := Process_Handle.Target;
                   Fail_Test ("Accessing an invalid handle should trigger an exception");
+               exception
+                  when Shared_Processes.Invalid_Handle => null;
+                  when others => Fail_Test ("Invalid handle access should raise Invalid_Handle");
                end;
-            exception
-               when Shared_Processes.Invalid_Handle => null;
-               when others => Fail_Test ("Invalid handle access should raise Invalid_Handle");
             end;
 
             -- Test copying behaviour
@@ -166,12 +168,51 @@ package body Emulator_Kit.Asynchronous.Processes is
                when others => Fail_Test ("Invalid handle copy should raise Program_Error");
             end;
          exception
-            when others => Fail_Test ("Invalid handle initialization and finalization should not trigger exceptions");
+            when others => Fail_Test ("No valid part of the handle lifecycle should trigger exceptions");
          end;
 
-         -- TODO : Check handle initialization, copying behavior, and finalization
-         declare
-            Proc_Handle : Process_Handle := Make_Process;
+         -- Check shared handle initialization, copying behavior, and finalization
+         begin
+            -- Test a single "shared" handle
+            declare
+               Proc_Handle : constant Process_Handle := Make_Process;
+            begin
+               Test_Element_Property (Proc_Handle.Is_Valid, "Newly cleated handles should be valid");
+               declare
+                  Handle_Target : Process_Access with Unreferenced;
+               begin
+                  Handle_Target := Proc_Handle.Target;
+               exception
+                  when others => Fail_Test ("Accessing the target of a valid handle should trigger no exception");
+               end;
+            end;
+
+            -- Test shared handle ownership transmission
+            declare
+               Proc_Handle_2 : Process_Handle;
+            begin
+               -- Create a handle and transmit its ownership
+               declare
+                  Proc_Handle_1 : constant Process_Handle := Make_Process;
+               begin
+                  Proc_Handle_2 := Proc_Handle_1;
+                  Test_Element_Property (Proc_Handle_2.Is_Valid, "A copy of a valid handle should be valid");
+                  Test_Element_Property (Proc_Handle_2.Target = Proc_Handle_1.Target, "Handle copies should have the same target as the original");
+               end;
+
+               -- Check that after original handle termination, the handle copy is still valid
+               Test_Element_Property (Proc_Handle_2.Is_Valid, "A handle copy should remain valid when the original is gone");
+               declare
+                  Handle_Target : Process_Access with Unreferenced;
+               begin
+                  Handle_Target := Proc_Handle_2.Target;
+               exception
+                  when others => Fail_Test ("Accessing the target of a valid handle copy should trigger no exception");
+               end;
+            end;
+         exception
+            when others => Fail_Test ("No valid part of the handle lifecycle should trigger exceptions");
+         end;
       end Test_Shared_Processes;
 
       procedure Test_Processes_Package is
