@@ -28,7 +28,7 @@ package Emulator_Kit.Memory.Byte_Buffers is
    -- Buffers may be as large as the AMD64 upper physical memory size limit.
    -- They also must be aliased, to allow for raw access from assembly code.
    -- They may be indexed either on a 0- or 1-based basis.
-   type Byte_Buffer_Index is range 0 .. Physical.Max_Memory_Size;
+   type Byte_Buffer_Index is range 0 .. Physical.Max_Physical_Memory_Size;
    type Byte_Buffer is array (Byte_Buffer_Index range <>) of aliased Data_Types.Byte;
    subtype Byte_Buffer_Size is Byte_Buffer_Index; -- Must be a subtype to allow for discriminated types
 
