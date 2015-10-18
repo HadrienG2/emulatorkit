@@ -20,6 +20,8 @@ package Emulator_Kit.CPU.Registers is
 
    -- First, let's list all the registers, before declaring more specific subtypes below.
    -- The order of enumeration matters. It roughly follows the chronological order of introduction.
+   type Reg_Segment is (CS, DS, ES, FS, GS, SS);
+
    type Reg_8 is (AH, BH, CH, DH,
                   AL, BL, CL, DL,
                   SIL, DIL,
@@ -27,23 +29,25 @@ package Emulator_Kit.CPU.Registers is
                   R8B, R9B, R10B, R11B, R12B, R13B, R14B, R15B);
 
    type Reg_16 is (AX, BX, CX, DX,
-                   DI, SI,
+                   SI, DI,
                    BP, SP,
                    R8W, R9W, R10W, R11W, R12W, R13W, R14W, R15W,
                    FLAGS,
-                   IP);
+                   IP,
+                   FSW, FCW, FTW);
 
    type Reg_32 is (EAX, EBX, ECX, EDX,
-                   EDI, ESI,
+                   ESI, EDI,
                    EBP, ESP,
                    R8D, R9D, R10D, R11D, R12D, R13D, R14D, R15D,
                    EFLAGS,
-                   EIP);
+                   EIP,
+                   MXCSR);
 
    type Reg_64 is (MMX0, MMX1, MMX2, MMX3, MMX4, MMX5, MMX6, MMX7,
                    RAX, RBX, RCX, RDX,
-                   RBP, RSI,
-                   RDI, RSP,
+                   RSI, RDI,
+                   RBP, RSP,
                    R8, R9, R10, R11, R12, R13, R14, R15,
                    RFLAGS,
                    RIP);
@@ -56,7 +60,8 @@ package Emulator_Kit.CPU.Registers is
    type Reg_256 is (YMM0, YMM1, YMM2, YMM3, YMM4, YMM5, YMM6, YMM7,
                     YMM8, YMM9, YMM10, YMM11, YMM12, YMM13, YMM14, YMM15);
 
-   -- The general purpose registers (GP_Reg) may be accessed in many different ways
+   -- The general purpose registers (GP_Reg) may be accessed in many different ways, depending on the CPU operating mode.
+   -- Here, "Legacy" types denote the registers that are available when long mode is not active.
    subtype GP_Reg_8 is Reg_8 range AH .. R15B;
    subtype GP_Reg_High8 is GP_Reg_8 range AH .. DH; -- Cannot be used with the REX instruction prefix
    subtype GP_Reg_Low8 is GP_Reg_8 range AL .. R15B;

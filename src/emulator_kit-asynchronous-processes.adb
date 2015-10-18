@@ -148,7 +148,7 @@ package body Emulator_Kit.Asynchronous.Processes is
                declare
                   Handle_Target : Process_Access with Unreferenced;
                begin
-                  Handle_Target := Process_Handle.Target;
+                  Handle_Target := Proc_Handle.Target;
                   Fail_Test ("Accessing an invalid handle should trigger an exception");
                exception
                   when Shared_Processes.Invalid_Handle => null;
