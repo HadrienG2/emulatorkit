@@ -15,20 +15,20 @@
 -- You should have received a copy of the GNU General Public License
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
-with Emulator_Kit.Asynchronous.Processes;
 with Emulator_Kit.Data_Types;
 with Emulator_Kit.Memory.Abstract_Memory;
 with Emulator_Kit.Memory.Byte_Buffers;
 with Emulator_Kit.Memory.Byte_Streams;
+with Emulator_Kit.Tasking.Processes;
 
 -- This package defines a physical memory implementation that is based on a buffer, isolated from host memory.
 package Emulator_Kit.Memory.Physical.Buffered is
 
    -- First, let's define few shortcuts to make code more readable
-   subtype Process_Handle is Asynchronous.Processes.Process_Handle;
    subtype Byte_Buffer_Handle is Memory.Byte_Buffers.Byte_Buffer_Handle;
    subtype Byte_Buffer_Size is Memory.Byte_Buffers.Byte_Buffer_Size;
    subtype Byte_Stream_Handle is Memory.Byte_Streams.Byte_Stream_Handle;
+   subtype Process_Handle is Tasking.Processes.Process_Handle;
 
    -- Then comes the buffer-based physical memory implementation
    task type Buffer_Memory (Buffer_Size : Byte_Buffer_Size) is new Abstract_Memory.Memory_Interface with

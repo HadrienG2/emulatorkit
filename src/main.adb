@@ -21,8 +21,6 @@ with Ada.Text_IO;
 -- Compiler warnings about unused units should thus be suppressed.
 pragma Warnings (Off);
 with Emulator_Kit;
-with Emulator_Kit.Asynchronous;
-with Emulator_Kit.Asynchronous.Processes;
 with Emulator_Kit.CPU;
 with Emulator_Kit.CPU.Registers;
 with Emulator_Kit.CPU.Registers.Data;
@@ -36,7 +34,9 @@ with Emulator_Kit.Memory.Byte_Buffers;
 with Emulator_Kit.Memory.Byte_Streams;
 with Emulator_Kit.Memory.Physical;
 with Emulator_Kit.Memory.Physical.Buffered;
-with Emulator_Kit.Shared_Resources;
+with Emulator_Kit.Tasking;
+with Emulator_Kit.Tasking.Processes;
+with Emulator_Kit.Tasking.Shared_Resources;
 pragma Warnings (On);
 
 procedure Main is
@@ -45,11 +45,11 @@ procedure Main is
    use type Memory.Universal_Address, Memory.Universal_Size;
    use type Memory.Byte_Buffers.Byte_Buffer_Index;
 
-   subtype Process_Handle is Asynchronous.Processes.Process_Handle;
    subtype Byte_Buffer_Handle is Memory.Byte_Buffers.Byte_Buffer_Handle;
    subtype Byte_Buffer_Index is Memory.Byte_Buffers.Byte_Buffer_Index;
    subtype Byte_Buffer_Size is Memory.Byte_Buffers.Byte_Buffer_Size;
    subtype Byte_Stream_Handle is Memory.Byte_Streams.Byte_Stream_Handle;
+   subtype Process_Handle is Tasking.Processes.Process_Handle;
 
    Mem_Size : constant := 2 ** 31; -- Program requires twice that memory to run (once for emulated memory, once for client buffer)
 

@@ -23,7 +23,7 @@ with Ada.Finalization;
 generic
    type Resource (<>) is limited private; -- DEBUG : On GNAT GPL 2015, this fails to build when passed a tagged protected type
 --     type Resource (<>) is tagged limited private; -- DEBUG : This works, but it does not do what I want
-package Emulator_Kit.Shared_Resources is
+package Emulator_Kit.Tasking.Shared_Resources is
 
    -- First, we'll need pointers to resources allocated on a global scope.
    type Resource_Access is access all Resource;
@@ -64,4 +64,4 @@ private
    overriding procedure Adjust (Handle : in out Resource_Handle);
    overriding procedure Finalize (Handle : in out Resource_Handle);
 
-end Emulator_Kit.Shared_Resources;
+end Emulator_Kit.Tasking.Shared_Resources;

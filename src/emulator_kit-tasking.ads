@@ -17,8 +17,8 @@
 
 with Ada.Exceptions;
 
--- This package hierarchy provides asynchronous communication primitives between emulator tasks
-package Emulator_Kit.Asynchronous is
+-- This package hierarchy provides communication primitives between emulator tasks
+package Emulator_Kit.Tasking is
 
    -- Represents an interface to an asynchronous communication channel that may transmit exceptions from a server side to a client side.
    -- On the basic exception channel, exceptions are fatal : once an exception has occured, nothing good will ever come out of the channel.
@@ -33,4 +33,4 @@ package Emulator_Kit.Asynchronous is
    -- the communication channel is reset to a valid state.
    type Synchronous_Exception_Channel is protected interface and Exception_Channel;
 
-end Emulator_Kit.Asynchronous;
+end Emulator_Kit.Tasking;

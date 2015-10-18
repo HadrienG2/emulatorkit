@@ -17,7 +17,7 @@
 
 with Ada.Unchecked_Deallocation;
 
-package body Emulator_Kit.Shared_Resources is
+package body Emulator_Kit.Tasking.Shared_Resources is
 
    function Is_Valid (Handle : Resource_Handle) return Boolean is (Handle.Shared /= null);
 
@@ -62,4 +62,4 @@ package body Emulator_Kit.Shared_Resources is
       end if;
    end Finalize;
 
-end Emulator_Kit.Shared_Resources;
+end Emulator_Kit.Tasking.Shared_Resources;

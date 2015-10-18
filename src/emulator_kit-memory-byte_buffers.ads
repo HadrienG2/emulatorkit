@@ -16,8 +16,8 @@
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
 with Emulator_Kit.Data_Types;
-with Emulator_Kit.Shared_Resources;
 with Emulator_Kit.Memory.Physical;
+with Emulator_Kit.Tasking.Shared_Resources;
 
 -- This package defines buffers of bytes, intended as a temporary memory storage location
 package Emulator_Kit.Memory.Byte_Buffers is
@@ -54,7 +54,7 @@ package Emulator_Kit.Memory.Byte_Buffers is
    procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : Data_Types.Float_Extended_Access) with Inline;
 
    -- Byte buffers are likely to be shared between tasks, so we implement the shared handle mechanism for them
-   package Shared_Byte_Buffers is new Shared_Resources (Resource => Byte_Buffer);
+   package Shared_Byte_Buffers is new Tasking.Shared_Resources (Resource => Byte_Buffer);
    subtype Byte_Buffer_Access is Shared_Byte_Buffers.Resource_Access;
    subtype Byte_Buffer_Handle is Shared_Byte_Buffers.Resource_Handle;
    function Is_Valid (Handle : Byte_Buffer_Handle) return Boolean renames Shared_Byte_Buffers.Is_Valid;

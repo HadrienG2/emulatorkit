@@ -367,7 +367,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                   declare
                      Input_Index : constant Byte_Buffer_Index := Checked_Index (Input_Location, Byte_Count);
                      Output_Index : constant Byte_Buffer_Index := Checked_Index (Output_Location, Byte_Count);
-                     Copy_Process : constant Process_Handle := Asynchronous.Processes.Make_Process;
+                     Copy_Process : constant Process_Handle := Tasking.Processes.Make_Process;
                      Copy_Task_Access : constant Copy_Internal_Access := new Copy_Internal (Input_Index,
                                                                                             Output_Index,
                                                                                             Byte_Buffer_Size (Byte_Count));
@@ -389,7 +389,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                   -- Otherwise, proceed with the memory copy
                   declare
                      Input_Index : constant Byte_Buffer_Index := Checked_Index (Input_Location, Byte_Count);
-                     Copy_Process : constant Process_Handle := Asynchronous.Processes.Make_Process;
+                     Copy_Process : constant Process_Handle := Tasking.Processes.Make_Process;
                      Copy_Task_Access : constant Copy_To_Buffer_Access := new Copy_To_Buffer (Input_Index,
                                                                                               Byte_Buffer_Size (Byte_Count));
                   begin
@@ -410,7 +410,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                   -- Otherwise, proceed with the memory copy
                   declare
                      Output_Index : constant Byte_Buffer_Index := Checked_Index (Output_Location, Byte_Count);
-                     Copy_Process : constant Process_Handle := Asynchronous.Processes.Make_Process;
+                     Copy_Process : constant Process_Handle := Tasking.Processes.Make_Process;
                      Copy_Task_Access : constant Copy_From_Buffer_Access := new Copy_From_Buffer (Output_Index,
                                                                                                   Byte_Buffer_Size (Byte_Count));
                   begin

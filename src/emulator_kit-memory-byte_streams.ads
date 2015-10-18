@@ -16,9 +16,9 @@
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
 with Ada.Exceptions;
---  with Emulator_Kit.Asynchronous;
 with Emulator_Kit.Memory.Byte_Buffers;
-with Emulator_Kit.Shared_Resources;
+--  with Emulator_Kit.Tasking;
+with Emulator_Kit.Tasking.Shared_Resources;
 
 -- This package defines a way to asynchronously transmit a stream of data between processes
 package Emulator_Kit.Memory.Byte_Streams is
@@ -43,7 +43,7 @@ package Emulator_Kit.Memory.Byte_Streams is
    -- Buffer_Size is the size of the stream's internal ring buffer. It should be chosen as a multiple of Chunk_Size. For a synchronous client that continuously
    -- listens to the server, 2x is good enough. But for less favorable client access patterns, such as doing nothing for a while, then asking for a lot
    -- of chunks at once, larger buffers may help performance.
---     protected type Byte_Stream (Buffer_Size : Byte_Buffer_Size; Chunk_Size : Byte_Buffer_Size) is new Asynchronous.Synchronous_Exception_Channel with  -- DEBUG : This should work, but doesn't on GNAT GPL 2015
+--     protected type Byte_Stream (Buffer_Size : Byte_Buffer_Size; Chunk_Size : Byte_Buffer_Size) is new Tasking.Synchronous_Exception_Channel with  -- DEBUG : This should work, but doesn't on GNAT GPL 2015
    protected type Byte_Stream (Buffer_Size : Byte_Buffer_Size; Chunk_Size : Byte_Buffer_Size) is  -- DEBUG : This works
 
       -- Common interface for everyone involved
@@ -98,7 +98,7 @@ package Emulator_Kit.Memory.Byte_Streams is
    end Byte_Stream;
 
    -- As any asynchronous communication primitive, byte streams are likely to require reference counted handles (one for server, one for client)
-   package Shared_Byte_Streams is new Shared_Resources (Resource => Byte_Stream);
+   package Shared_Byte_Streams is new Tasking.Shared_Resources (Resource => Byte_Stream);
    subtype Byte_Stream_Access is Shared_Byte_Streams.Resource_Access;
    subtype Byte_Stream_Handle is Shared_Byte_Streams.Resource_Handle;
    function Is_Valid (Handle : Byte_Stream_Handle) return Boolean renames Shared_Byte_Streams.Is_Valid;

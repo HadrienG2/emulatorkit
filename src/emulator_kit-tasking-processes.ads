@@ -16,10 +16,10 @@
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
 with Ada.Exceptions;
-with Emulator_Kit.Shared_Resources;
+with Emulator_Kit.Tasking.Shared_Resources;
 
--- This package sets up an interface to ongoing asynchronous processes
-package Emulator_Kit.Asynchronous.Processes is
+-- This package sets up a basic interface to ongoing asynchronous processes
+package Emulator_Kit.Tasking.Processes is
 
    -- Represents an ongoing process that will be completed at some point
 --     protected type Process is new Exception_Channel with  -- DEBUG : This should work, but doesn't on GNAT GPL 2015
@@ -51,4 +51,4 @@ package Emulator_Kit.Asynchronous.Processes is
    -- Test the components of this package
    procedure Test;
 
-end Emulator_Kit.Asynchronous.Processes;
+end Emulator_Kit.Tasking.Processes;

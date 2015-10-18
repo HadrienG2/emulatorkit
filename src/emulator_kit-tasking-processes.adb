@@ -17,7 +17,7 @@
 
 with Emulator_Kit.Debug.Test;
 
-package body Emulator_Kit.Asynchronous.Processes is
+package body Emulator_Kit.Tasking.Processes is
 
    use type Ada.Exceptions.Exception_Id;
 
@@ -221,7 +221,7 @@ package body Emulator_Kit.Asynchronous.Processes is
          Test_Package_Element (To_Entity_Name ("Shared_Processes"), Test_Shared_Processes'Access);
       end Test_Processes_Package;
    begin
-      Test_Package (To_Entity_Name ("Asynchronous.Processes"), Test_Processes_Package'Access);
+      Test_Package (To_Entity_Name ("Tasking.Processes"), Test_Processes_Package'Access);
    end Test;
 
 begin
@@ -229,4 +229,4 @@ begin
    -- Automatically test the package when it is included
    Debug.Test.Elaboration_Self_Test (Test'Access);
 
-end Emulator_Kit.Asynchronous.Processes;
+end Emulator_Kit.Tasking.Processes;
