@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
+with Emulator_Kit.Debug.Test;
 with System.Machine_Code;
 
 package body Emulator_Kit.Memory.Byte_Buffers is
@@ -212,5 +213,60 @@ package body Emulator_Kit.Memory.Byte_Buffers is
 --                                 Clobber => "memory st(0)",
 --                                 Volatile => True);
    end Unchecked_Read;
+
+   procedure Test is
+      use Emulator_Kit.Debug.Test;
+
+      procedure Test_Byte_Buffer is
+      begin
+         -- Test word I/O
+         declare
+            use type Emulator_Kit.Data_Types.Word;
+            Buffer : Byte_Buffer (5 .. 7) := (others => 42);
+            Output : Data_Types.Word;
+         begin
+            -- At the beginning of a buffer
+            declare
+               LSB : constant := 33;
+               MSB : constant := 255;
+               Input : constant Data_Types.Word := LSB + 256 * MSB;
+            begin
+               Unchecked_Write (Buffer, 5, Data_Types.Word'(Input));
+               Test_Element_Property (Buffer = (LSB, MSB, 42), "Writing words at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 5, Output);
+               Test_Element_Property (Output = Input, "Reading words from the beginning of byte buffers should work");
+            end;
+            Buffer := (others => 42);
+
+            -- At the end of a buffer
+            declare
+               LSB : constant := 63;
+               MSB : constant := 145;
+               Input : constant Data_Types.Word := LSB + 256 * MSB;
+            begin
+               Unchecked_Write (Buffer, 6, Data_Types.Word'(Input));
+               Test_Element_Property (Buffer = (42, LSB, MSB), "Writing words at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 6, Output);
+               Test_Element_Property (Output = Input, "Reading words from the beginning of byte buffers should work");
+            end;
+         end;
+
+         declare
+         -- TODO : Test dword, qword, dqword, fqword, sfloat, dfloat, tfloat
+      end Test_Byte_Buffer;
+
+      procedure Test_Byte_Buffers_Package is
+      begin
+         Test_Package_Element (To_Entity_Name ("Byte_Buffer"), Test_Byte_Buffer'Access);
+         -- TODO : Test_Package_Element (To_Entity_Name ("Shared_Byte_Buffers"), Test_Shared_Byte_Buffers'Access);
+      end Test_Byte_Buffers_Package;
+   begin
+      Test_Package (To_Entity_Name ("Memory.Byte_Buffers"), Test_Byte_Buffers_Package'Access);
+   end Test;
+
+begin
+
+   -- Automatically test the package when it is included
+   Debug.Test.Elaboration_Self_Test (Test'Access);
 
 end Emulator_Kit.Memory.Byte_Buffers;
