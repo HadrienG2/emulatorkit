@@ -71,10 +71,4 @@ package body Emulator_Kit.Debug.Test is
       raise Test_Failed;
    end Fail_Test;
 
-begin
-
-   if Test_On_Elaboration then
-      Debug.Message ("Beginning package elaboration self-tests");
-   end if;
-
 end Emulator_Kit.Debug.Test;
