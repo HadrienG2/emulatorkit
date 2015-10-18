@@ -19,11 +19,11 @@ with Emulator_Kit.Data_Types;
 with Emulator_Kit.Memory.Physical;
 with Emulator_Kit.Tasking.Shared_Resources;
 
--- This package defines buffers of bytes, intended as a temporary memory storage location
+-- This package defines buffers of bytes, intended as a place to store memory into
 package Emulator_Kit.Memory.Byte_Buffers is
 
-   -- This exception will be thrown if a client requests the emulator to access a byte buffer beyond its bounds
-   Overflow : exception;
+   -- This exception must be thrown if a client requests the emulator to access a byte buffer beyond its bounds
+   Buffer_Overflow : exception;
 
    -- Buffers may be as large as the AMD64 upper physical memory size limit.
    -- They also must be aliased, to allow for raw access from assembly code.

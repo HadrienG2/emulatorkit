@@ -383,7 +383,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                                   Process : out Process_Handle) do
                   -- Check that the requested access does not go beyond buffer boundaries
                   if Byte_Count > Output.Target'Length then
-                     raise Byte_Buffers.Overflow;
+                     raise Byte_Buffers.Buffer_Overflow;
                   end if;
 
                   -- Otherwise, proceed with the memory copy
@@ -404,7 +404,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                                   Process : out Process_Handle) do
                   -- Check that the requested access does not go beyond buffer boundaries
                   if Byte_Count > Input.Target'Length then
-                     raise Byte_Buffers.Overflow;
+                     raise Byte_Buffers.Buffer_Overflow;
                   end if;
 
                   -- Otherwise, proceed with the memory copy
@@ -461,7 +461,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
          exception
              -- These exceptions are considered non-fatal, as they are the client's fault. They solely result into a debug message being printed.
             when Illegal_Address => Debug.Task_Message ("Rejected illegal memory access");
-            when Byte_Buffers.Overflow => Debug.Task_Message ("Rejected overflowing buffer access");
+            when Byte_Buffers.Buffer_Overflow => Debug.Task_Message ("Rejected overflowing buffer access");
          end;
       end loop;
 
