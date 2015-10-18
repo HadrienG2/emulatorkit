@@ -34,7 +34,4 @@ package Emulator_Kit.Memory is
    function "+"(Left : Universal_Address; Right : Universal_Size) return Universal_Address with Inline;
    function "-"(Left : Universal_Address; Right : Universal_Size) return Universal_Address with Inline;
 
-   -- Test the components of this package
-   procedure Test;
-
 end Emulator_Kit.Memory;

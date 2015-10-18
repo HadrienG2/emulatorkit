@@ -48,7 +48,4 @@ package Emulator_Kit.Tasking.Processes is
    function Target (Handle : Process_Handle) return not null Process_Access renames Shared_Processes.Target;
    function Make_Process return Process_Handle is (Shared_Processes.Make_Shared (new Process));
 
-   -- Test the components of this package
-   procedure Test;
-
 end Emulator_Kit.Tasking.Processes;
