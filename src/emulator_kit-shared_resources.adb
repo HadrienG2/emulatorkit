@@ -19,12 +19,12 @@ with Ada.Unchecked_Deallocation;
 
 package body Emulator_Kit.Shared_Resources is
 
-   function Is_Valid (Handle : Resource_Handle) return Boolean is (Handle.Manager /= null);
+   function Is_Valid (Handle : Resource_Handle) return Boolean is (Handle.Shared /= null);
 
    function Target (Handle : Resource_Handle) return not null Resource_Access is
    begin
       if Handle.Is_Valid then
-         return Handle.Manager.Internal_Resource;
+         return Handle.Shared.Internal_Resource;
       else
          raise Invalid_Handle;
       end if;
@@ -33,15 +33,15 @@ package body Emulator_Kit.Shared_Resources is
    function Make_Shared (Target : not null Resource_Access) return Resource_Handle is
    begin
       return Handle : Resource_Handle do
-         Handle.Manager := new Resource_Manager'(Internal_Resource => Target,
-                                                 Handle_Count => 1);
+         Handle.Shared := new Shared_Resource'(Internal_Resource => Target,
+                                               Handle_Count => 1);
       end return;
    end Make_Shared;
 
    procedure Adjust (Handle : in out Resource_Handle) is
    begin
       if Handle.Is_Valid then
-         Handle.Manager.Handle_Count := Handle.Manager.Handle_Count + 1;
+         Handle.Shared.Handle_Count := Handle.Shared.Handle_Count + 1;
       else
          raise Invalid_Handle;
       end if;
@@ -50,14 +50,14 @@ package body Emulator_Kit.Shared_Resources is
    procedure Finalize (Handle : in out Resource_Handle) is
       procedure Liberate_Resource is new Ada.Unchecked_Deallocation (Object => Resource,
                                                                      Name => Resource_Access);
-      procedure Liberate_Manager is new Ada.Unchecked_Deallocation (Object => Resource_Manager,
-                                                                    Name => Resource_Manager_Access);
+      procedure Liberate_Shared is new Ada.Unchecked_Deallocation (Object => Shared_Resource,
+                                                                   Name => Shared_Resource_Access);
    begin
       if Handle.Is_Valid then
-         Handle.Manager.Handle_Count := Handle.Manager.Handle_Count - 1;
-         if Handle.Manager.Handle_Count = 0 then
-            Liberate_Resource (Handle.Manager.Internal_Resource);
-            Liberate_Manager (Handle.Manager);
+         Handle.Shared.Handle_Count := Handle.Shared.Handle_Count - 1;
+         if Handle.Shared.Handle_Count = 0 then
+            Liberate_Resource (Handle.Shared.Internal_Resource);
+            Liberate_Shared (Handle.Shared);
          end if;
       end if;
    end Finalize;

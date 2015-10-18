@@ -24,7 +24,7 @@ package Emulator_Kit.Memory is
    Illegal_Address : exception;
 
    -- The address and size of objects may be at most 2^64 - 1 on the AMD64 architecture.
-   -- (Well, technically speaking, it's possible to envision an object of size 2^64, but then we couldn't count its size)
+   -- (Well, theoretically speaking, it's possible to envision an object of size 2^64, but then we couldn't count its size)
    type Universal_Address is new Data_Types.Quad_Word;
    type Universal_Size is new Data_Types.Quad_Word;
 

@@ -38,29 +38,29 @@ package Emulator_Kit.Shared_Resources is
    function Target (Handle : Resource_Handle) return not null Resource_Access;
 
    -- The shared resource is allocated by the object creator, then ownership is transferred using the following function.
+   -- Suggest usage is Make_Shared (new Resource (<resource discriminants>)).
+   --
    -- The heap object received by Make_Shared stays live as long as at least one of its handles in in scope. It is then liberated.
    -- Handle copies are properly taken into account by incrementing or decrementing the shared resource's reference count.
-   --
-   -- Suggest usage is Make_Shared (new Resource (<resource discriminants>))
    function Make_Shared (Target : not null Resource_Access) return Resource_Handle;
 
 private
 
    -- Behind the scenes, a dynamically allocated control block is used to count the amount of references to resources.
-   type Resource_Manager is
+   type Shared_Resource is
       record
          Internal_Resource : Resource_Access;
          Handle_Count : Natural := 0 with Atomic;
       end record;
-   type Resource_Manager_Access is access Resource_Manager;
+   type Shared_Resource_Access is access Shared_Resource;
 
    -- All the resource handles do is point to this control block.
    type Resource_Handle is new Ada.Finalization.Controlled with
       record
-         Manager : Resource_Manager_Access := null;
+         Shared : Shared_Resource_Access := null;
       end record;
 
-   -- These procedures ensure that the reference count is incremented and decremented properly.
+   -- These procedures ensure that the resource reference count is incremented and decremented properly.
    overriding procedure Adjust (Handle : in out Resource_Handle);
    overriding procedure Finalize (Handle : in out Resource_Handle);
 
