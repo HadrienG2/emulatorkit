@@ -4,11 +4,7 @@ This project provides a set of Ada 2012 components out of which one can build an
 
 ## Release model redux
 
-The project uses a three stage rolling release model, inspired by that of Debian GNU/Linux.
-
-* Code in the unstable branch is not feature-frozen and only partially tested. Functions are still likely to move around in the package hierarchy. Use at your own risk.
-* Code in the testing branch is feature-frozen, but not yet fully tested. Feel free to experiment with it and tell us everything that's wrong !
-* Code in the release branch is considered stable. We will do everything possible not to break compatibility with it, and if we end up having to do so, we will maintain the pre-breach code as a feature-frozen branch for one year to give you time to adjust.
+At the moment, this project is at a too early development stage to devise a complete release model. Ultimately, it should use a rolling release model.
 
 ## Compiler configuration and portability
 
