@@ -37,7 +37,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
       function To_Bytes (Size_In_Bits : Positive) return Universal_Size is
         (Universal_Size (Size_In_Bits / 8 + (if Size_In_Bits mod 8 = 0 then 0 else 1)));
 
-      -- Check that a memory access request is valid, if so return the associated buffer index
+      -- Check that a memory access request is valid, if so return the associated internal buffer index
       function Checked_Index (Location : Universal_Address; Size : Universal_Size) return Byte_Buffer_Index is
       begin
          if Location > Last_Valid_Address or else Universal_Address'Pred (Location + Size) > Last_Valid_Address then
@@ -470,6 +470,6 @@ package body Emulator_Kit.Memory.Physical.Buffered is
       when Occurrence : others =>
          Debug.Task_Message_Unhandled_Exception (Occurrence);
          raise;
-   end;
+   end Buffer_Memory;
 
 end Emulator_Kit.Memory.Physical.Buffered;

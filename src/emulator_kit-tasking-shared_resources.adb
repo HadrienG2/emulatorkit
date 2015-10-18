@@ -30,15 +30,15 @@ package body Emulator_Kit.Tasking.Shared_Resources is
       end if;
    end Target;
 
-   function Make_Shared (Target : not null Resource_Access) return Resource_Handle is
+   function Make_Shared (New_Target : not null Resource_Access) return Resource_Handle is
    begin
       return Handle : Resource_Handle do
-         Handle.Shared := new Shared_Resource'(Internal_Resource => Target,
+         Handle.Shared := new Shared_Resource'(Internal_Resource => New_Target,
                                                Handle_Count => 1);
       end return;
    end Make_Shared;
 
-   procedure Adjust (Handle : in out Resource_Handle) is
+   overriding procedure Adjust (Handle : in out Resource_Handle) is
    begin
       if Handle.Is_Valid then
          Handle.Shared.Handle_Count := Handle.Shared.Handle_Count + 1;
@@ -47,7 +47,7 @@ package body Emulator_Kit.Tasking.Shared_Resources is
       end if;
    end Adjust;
 
-   procedure Finalize (Handle : in out Resource_Handle) is
+   overriding procedure Finalize (Handle : in out Resource_Handle) is
       procedure Liberate_Resource is new Ada.Unchecked_Deallocation (Object => Resource,
                                                                      Name => Resource_Access);
       procedure Liberate_Shared is new Ada.Unchecked_Deallocation (Object => Shared_Resource,

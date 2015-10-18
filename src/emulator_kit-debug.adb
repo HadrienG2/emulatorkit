@@ -20,15 +20,15 @@ with Ada.Text_IO;
 
 package body Emulator_Kit.Debug is
 
-   procedure Message (Message : String) is
+   procedure Message (Contents : String) is
    begin
-      Ada.Text_IO.Put_Line ("DEBUG : " & Message);
+      Ada.Text_IO.Put_Line ("DEBUG : " & Contents);
    end Message;
 
-   procedure Task_Message (Message : String) is
+   procedure Task_Message (Contents : String) is
       use Ada.Task_Identification;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG FROM " & Image (Current_Task) & " : " & Message);
+      Ada.Text_IO.Put_Line ("DEBUG FROM " & Image (Current_Task) & " : " & Contents);
    end Task_Message;
 
    procedure Message_Unhandled_Exception (Occurrence : Ada.Exceptions.Exception_Occurrence) is

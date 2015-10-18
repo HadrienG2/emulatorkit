@@ -42,7 +42,7 @@ package Emulator_Kit.Tasking.Shared_Resources is
    --
    -- The heap object received by Make_Shared stays live as long as at least one of its handles in in scope. It is then liberated.
    -- Handle copies are properly taken into account by incrementing or decrementing the shared resource's reference count.
-   function Make_Shared (Target : not null Resource_Access) return Resource_Handle;
+   function Make_Shared (New_Target : not null Resource_Access) return Resource_Handle;
 
 private
 

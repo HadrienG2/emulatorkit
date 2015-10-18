@@ -21,10 +21,10 @@ with Ada.Exceptions;
 package Emulator_Kit.Debug is
 
    -- Display a debug message
-   procedure Message (Message : String);
+   procedure Message (Contents : String);
 
    -- Display a debug message featuring task identification information
-   procedure Task_Message (Message : String);
+   procedure Task_Message (Contents : String);
 
    -- Display a debug message reporting an unhandled exception
    procedure Message_Unhandled_Exception (Occurrence : Ada.Exceptions.Exception_Occurrence);

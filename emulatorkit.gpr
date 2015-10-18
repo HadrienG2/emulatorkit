@@ -5,11 +5,11 @@ project EmulatorKit is
    for Main use ("main.adb");
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatVa", "-gnatwa", "-gnatyt", "-g", "-O3", "-fstack-check", "-gnatE", "-gnat12", "-gnato", "-gnata");
+      for Default_Switches ("ada") use ("-gnatVa", "-gnatwa.w.s.k.fh", "-gnatytIkxuSrpOnlihfeBbAa", "-g", "-fstack-check", "-gnat12", "-gnato", "-gnata", "-O3", "-gnatn", "-funroll-loops", "-gnatE");
    end Compiler;
 
    package Builder is
-      for Default_Switches ("ada") use ("-s", "-g", "-k", "-j4", "-m");
+      for Default_Switches ("ada") use ("-s", "-g", "-k", "-j4");
    end Builder;
 
    package Linker is

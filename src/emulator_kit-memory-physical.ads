@@ -20,7 +20,7 @@ package Emulator_Kit.Memory.Physical is
 
    -- The AMD64 architecture mandates that physical memory addresses be at most 52 bit wide.
    Max_Memory_Size : constant := 2 ** 52;
-   type Address is new Memory.Universal_Address range 0 .. Universal_Address'Pred (Max_Memory_Size);
-   type Size is new Memory.Universal_Size range 0 .. Max_Memory_Size;
+   type Physical_Address is new Memory.Universal_Address range 0 .. Universal_Address'Pred (Max_Memory_Size);
+   type Physical_Size is new Memory.Universal_Size range 0 .. Max_Memory_Size;
 
 end Emulator_Kit.Memory.Physical;

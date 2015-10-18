@@ -35,42 +35,42 @@ package Emulator_Kit.Memory.Abstract_Memory is
    type Memory_Interface is task interface;
 
    -- The simplest memory interface that we can propose is a way to synchronously write standard x86_64 data types from variables...
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Byte; Output_Location : Universal_Address) is abstract;
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Word; Output_Location : Universal_Address) is abstract;
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Double_Word; Output_Location : Universal_Address) is abstract;
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Quad_Word; Output_Location : Universal_Address) is abstract;
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Two_Quad_Words_Access_Const; Output_Location : Universal_Address) is abstract;
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Four_Quad_Words_Access_Const; Output_Location : Universal_Address) is abstract;
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Float_Single; Output_Location : Universal_Address) is abstract;
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Float_Double; Output_Location : Universal_Address) is abstract;
-   procedure Write (Memory : Memory_Interface; Input : Data_Types.Float_Extended_Access_Const; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Byte; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Word; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Double_Word; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Quad_Word; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Two_Quad_Words_Access_Const; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Four_Quad_Words_Access_Const; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Float_Single; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Float_Double; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : Memory_Interface; Input : Data_Types.Float_Extended_Access_Const; Output_Location : Universal_Address) is abstract;
 
    -- ...and read them to variables
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Byte) is abstract;
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Word) is abstract;
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Double_Word) is abstract;
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Quad_Word) is abstract;
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Two_Quad_Words_Access) is abstract;
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Four_Quad_Words_Access) is abstract;
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Float_Single) is abstract;
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Float_Double) is abstract;
-   procedure Read (Memory : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Float_Extended_Access) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Byte) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Word) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Double_Word) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Quad_Word) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Two_Quad_Words_Access) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Four_Quad_Words_Access) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Float_Single) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Float_Double) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Float_Extended_Access) is abstract;
 
    -- The interface above is necessary for clean CPU emulation, but not efficient at all, and hence to be avoided for large data transfers.
    -- For these use cases, it is better to use the asynchronous bulk data transfers primitives that are provided below.
 
    -- The simplest and fastest bulk data transfer mode that may be envisioned is a bulk byte copy
-   procedure Start_Copy (Memory : Memory_Interface;
+   procedure Start_Copy (Within : Memory_Interface;
                          Input_Location : Universal_Address;
                          Output_Location : Universal_Address;
                          Byte_Count : Universal_Size;
                          Process : out Process_Handle) is abstract;
-   procedure Start_Copy (Memory : Memory_Interface;
+   procedure Start_Copy (Source : Memory_Interface;
                          Input_Location : Universal_Address;
                          Output : Byte_Buffer_Handle;
                          Byte_Count : Universal_Size;
                          Process : out Process_Handle) is abstract;
-   procedure Start_Copy (Memory : Memory_Interface;
+   procedure Start_Copy (Target : Memory_Interface;
                          Input : Byte_Buffer_Handle;
                          Output_Location : Universal_Address;
                          Byte_Count : Universal_Size;
@@ -80,11 +80,11 @@ package Emulator_Kit.Memory.Abstract_Memory is
    -- it can also be useful to continuously stream data from someplace.
    --
    -- A chunk size of 4096 provides a fairly good compromise between performance and memory size for large data transfers.
-   procedure Start_Reading (Memory : Memory_Interface;
+   procedure Start_Reading (Source : Memory_Interface;
                             Input_Location : Universal_Address;
                             Stream_Chunk_Size : Byte_Buffer_Size;
                             Stream : out Byte_Stream_Handle) is abstract;
-   procedure Start_Writing (Memory : Memory_Interface;
+   procedure Start_Writing (Target : Memory_Interface;
                             Output_Location : Universal_Address;
                             Stream_Chunk_Size : Byte_Buffer_Size;
                             Stream : out Byte_Stream_Handle) is abstract;
