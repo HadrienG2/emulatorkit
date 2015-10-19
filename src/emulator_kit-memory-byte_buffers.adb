@@ -340,7 +340,69 @@ package body Emulator_Kit.Memory.Byte_Buffers is
             end;
          end;
 
+         -- Test 128-bit SIMD I/O
+         declare
+            subtype Quad_Word is Emulator_Kit.Data_Types.Quad_Word;
+            subtype Two_Quad_Words is Emulator_Kit.Data_Types.Two_Quad_Words;
+            use type Quad_Word, Two_Quad_Words;
+            Buffer : Byte_Buffer (117 .. 134) := (others => 42);
+            Output : aliased Two_Quad_Words;
+         begin
+            -- At the beginning of a buffer
+            declare
+               Bytes : constant Byte_Buffer (0 .. 15) := (2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32);
+               Input : aliased constant Two_Quad_Words :=
+                 (1 => (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (3)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (4)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (5)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (6)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (7)),
+                  2 => (2 ** (0 * 8)) * Quad_Word (Bytes (8)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (9)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (10)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (11)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (12)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (13)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (14)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (15)));
+            begin
+               Unchecked_Write (Buffer, 117, Input'Access);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing quadwords at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 117, Output'Access);
+               Test_Element_Property (Output = Input, "Reading quadwords from the beginning of byte buffers should work");
+            end;
+            Buffer := (others => 42);
 
+            -- At the end of a buffer
+            declare
+               Bytes : constant Byte_Buffer (0 .. 15) := (3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33);
+               Input : aliased constant Two_Quad_Words :=
+                 (1 => (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (3)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (4)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (5)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (6)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (7)),
+                  2 => (2 ** (0 * 8)) * Quad_Word (Bytes (8)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (9)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (10)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (11)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (12)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (13)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (14)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (15)));
+            begin
+               Unchecked_Write (Buffer, 119, Input'Access);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing quadwords at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 119, Output'Access);
+               Test_Element_Property (Output = Input, "Reading quadwords from the beginning of byte buffers should work");
+            end;
+         end;
          -- TODO : Test dqword, fqword, sfloat, dfloat, tfloat
       end Test_Byte_Buffer;
 
