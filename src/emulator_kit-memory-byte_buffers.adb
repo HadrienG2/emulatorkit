@@ -221,18 +221,20 @@ package body Emulator_Kit.Memory.Byte_Buffers is
       begin
          -- Test word I/O
          declare
-            use type Emulator_Kit.Data_Types.Word;
-            Buffer : Byte_Buffer (5 .. 7) := (others => 42);
-            Output : Data_Types.Word;
+            subtype Word is Emulator_Kit.Data_Types.Word;
+            use type Word;
+            Buffer : Byte_Buffer (5 .. 8) := (others => 42);
+            Output : Word;
          begin
             -- At the beginning of a buffer
             declare
-               LSB : constant := 33;
-               MSB : constant := 255;
-               Input : constant Data_Types.Word := LSB + 256 * MSB;
+               Bytes : constant Byte_Buffer (0 .. 1) := (33, 255);
+               Input : constant Word :=
+                 (2 ** (0 * 8)) * Word (Bytes (0)) +
+                   (2 ** (1 * 8)) * Word (Bytes (1));
             begin
-               Unchecked_Write (Buffer, 5, Data_Types.Word'(Input));
-               Test_Element_Property (Buffer = (LSB, MSB, 42), "Writing words at the beginning of byte buffers should work");
+               Unchecked_Write (Buffer, 5, Input);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing words at the beginning of byte buffers should work");
                Unchecked_Read (Buffer, 5, Output);
                Test_Element_Property (Output = Input, "Reading words from the beginning of byte buffers should work");
             end;
@@ -240,19 +242,106 @@ package body Emulator_Kit.Memory.Byte_Buffers is
 
             -- At the end of a buffer
             declare
-               LSB : constant := 63;
-               MSB : constant := 145;
-               Input : constant Data_Types.Word := LSB + 256 * MSB;
+               Bytes : constant Byte_Buffer (0 .. 1) := (63, 145);
+               Input : constant Word :=
+                 (2 ** (0 * 8)) * Word (Bytes (0)) +
+                   (2 ** (1 * 8)) * Word (Bytes (1));
             begin
-               Unchecked_Write (Buffer, 6, Data_Types.Word'(Input));
-               Test_Element_Property (Buffer = (42, LSB, MSB), "Writing words at the beginning of byte buffers should work");
-               Unchecked_Read (Buffer, 6, Output);
+               Unchecked_Write (Buffer, 7, Input);
+               Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing words at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 7, Output);
                Test_Element_Property (Output = Input, "Reading words from the beginning of byte buffers should work");
             end;
          end;
 
+         -- Test doubleword I/O
          declare
-         -- TODO : Test dword, qword, dqword, fqword, sfloat, dfloat, tfloat
+            subtype Double_Word is Emulator_Kit.Data_Types.Double_Word;
+            use type Double_Word;
+            Buffer : Byte_Buffer (53 .. 58) := (others => 42);
+            Output : Double_Word;
+         begin
+            -- At the beginning of a buffer
+            declare
+               Bytes : constant Byte_Buffer (0 .. 3) := (12, 67, 255, 133);
+               Input : constant Double_Word :=
+                 (2 ** (0 * 8)) * Double_Word (Bytes (0)) +
+                   (2 ** (1 * 8)) * Double_Word (Bytes (1)) +
+                     (2 ** (2 * 8)) * Double_Word (Bytes (2)) +
+                       (2 ** (3 * 8)) * Double_Word (Bytes (3));
+            begin
+               Unchecked_Write (Buffer, 53, Input);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing doublewords at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 53, Output);
+               Test_Element_Property (Output = Input, "Reading doublewords from the beginning of byte buffers should work");
+            end;
+            Buffer := (others => 42);
+
+            -- At the end of a buffer
+            declare
+               Bytes : constant Byte_Buffer (0 .. 3) := (56, 118, 34, 28);
+               Input : constant Double_Word :=
+                 (2 ** (0 * 8)) * Double_Word (Bytes (0)) +
+                   (2 ** (1 * 8)) * Double_Word (Bytes (1)) +
+                     (2 ** (2 * 8)) * Double_Word (Bytes (2)) +
+                       (2 ** (3 * 8)) * Double_Word (Bytes (3));
+            begin
+               Unchecked_Write (Buffer, 55, Input);
+               Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing doublewords at the end of byte buffers should work");
+               Unchecked_Read (Buffer, 55, Output);
+               Test_Element_Property (Output = Input, "Reading doublewords from the end of byte buffers should work");
+            end;
+         end;
+
+         -- Test quadword I/O
+         declare
+            subtype Quad_Word is Emulator_Kit.Data_Types.Quad_Word;
+            use type Quad_Word;
+            Buffer : Byte_Buffer (127 .. 136) := (others => 42);
+            Output : Quad_Word;
+         begin
+            -- At the beginning of a buffer
+            declare
+               Bytes : constant Byte_Buffer (0 .. 7) := (63, 87, 2, 6, 98, 123, 25, 44);
+               Input : constant Quad_Word :=
+                 (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
+                   (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
+                     (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
+                       (2 ** (3 * 8)) * Quad_Word (Bytes (3)) +
+                         (2 ** (4 * 8)) * Quad_Word (Bytes (4)) +
+                           (2 ** (5 * 8)) * Quad_Word (Bytes (5)) +
+                             (2 ** (6 * 8)) * Quad_Word (Bytes (6)) +
+                               (2 ** (7 * 8)) * Quad_Word (Bytes (7));
+            begin
+               Unchecked_Write (Buffer, 127, Input);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing quadwords at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 127, Output);
+               Test_Element_Property (Output = Input, "Reading quadwords from the beginning of byte buffers should work");
+            end;
+            Buffer := (others => 42);
+
+            -- At the end of a buffer
+            declare
+               Bytes : constant Byte_Buffer (0 .. 7) := (127, 0, 0, 1, 192, 168, 1, 1);
+               Input : constant Quad_Word :=
+                 (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
+                   (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
+                     (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
+                       (2 ** (3 * 8)) * Quad_Word (Bytes (3)) +
+                         (2 ** (4 * 8)) * Quad_Word (Bytes (4)) +
+                           (2 ** (5 * 8)) * Quad_Word (Bytes (5)) +
+                             (2 ** (6 * 8)) * Quad_Word (Bytes (6)) +
+                               (2 ** (7 * 8)) * Quad_Word (Bytes (7));
+            begin
+               Unchecked_Write (Buffer, 129, Input);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing quadwords at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 129, Output);
+               Test_Element_Property (Output = Input, "Reading quadwords from the beginning of byte buffers should work");
+            end;
+         end;
+
+
+         -- TODO : Test dqword, fqword, sfloat, dfloat, tfloat
       end Test_Byte_Buffer;
 
       procedure Test_Byte_Buffers_Package is
