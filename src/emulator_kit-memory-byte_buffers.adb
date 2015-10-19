@@ -334,9 +334,9 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                                (2 ** (7 * 8)) * Quad_Word (Bytes (7));
             begin
                Unchecked_Write (Buffer, 129, Input);
-               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing quadwords at the beginning of byte buffers should work");
+               Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing quadwords at the end of byte buffers should work");
                Unchecked_Read (Buffer, 129, Output);
-               Test_Element_Property (Output = Input, "Reading quadwords from the beginning of byte buffers should work");
+               Test_Element_Property (Output = Input, "Reading quadwords from the end of byte buffers should work");
             end;
          end;
 
@@ -370,9 +370,9 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                   (2 ** (7 * 8)) * Quad_Word (Bytes (15)));
             begin
                Unchecked_Write (Buffer, 117, Input'Access);
-               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing quadwords at the beginning of byte buffers should work");
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing two quadwords at the beginning of byte buffers should work");
                Unchecked_Read (Buffer, 117, Output'Access);
-               Test_Element_Property (Output = Input, "Reading quadwords from the beginning of byte buffers should work");
+               Test_Element_Property (Output = Input, "Reading two quadwords from the beginning of byte buffers should work");
             end;
             Buffer := (others => 42);
 
@@ -398,9 +398,9 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                   (2 ** (7 * 8)) * Quad_Word (Bytes (15)));
             begin
                Unchecked_Write (Buffer, 119, Input'Access);
-               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing quadwords at the beginning of byte buffers should work");
+               Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing two quadwords at the end of byte buffers should work");
                Unchecked_Read (Buffer, 119, Output'Access);
-               Test_Element_Property (Output = Input, "Reading quadwords from the beginning of byte buffers should work");
+               Test_Element_Property (Output = Input, "Reading two quadwords from the end of byte buffers should work");
             end;
          end;
          -- TODO : Test dqword, fqword, sfloat, dfloat, tfloat
