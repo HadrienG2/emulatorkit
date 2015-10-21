@@ -30,15 +30,9 @@ package Emulator_Kit.Data_Types is
    type Quad_Word is mod 2 ** 64 with Size => 8 * Byte_Size, Alignment => 8;
 
    -- x86_64 SIMD types must be interpreted as arrays of quadwords (or something else).
-   type SIMD_Type is array (Positive range <>) of Quad_Word;
+   type SIMD_Type is array (Positive range <>) of aliased Quad_Word;
    type Two_Quad_Words is new SIMD_Type (1 .. 2) with Size => 16 * Byte_Size, Alignment => 16;
    type Four_Quad_Words is new SIMD_Type (1 .. 4) with Size => 32 * Byte_Size, Alignment => 32;
-
-   -- As SIMD types cannot be directly handled by standard Ada, we'll often need to manipulate them by access in assembly code.
-   type Two_Quad_Words_Access is access all Two_Quad_Words;
-   type Two_Quad_Words_Access_Const is access constant Two_Quad_Words;
-   type Four_Quad_Words_Access is access all Four_Quad_Words;
-   type Four_Quad_Words_Access_Const is access constant Four_Quad_Words;
 
    -- Native floating-point types on hosts with double-precision IEEE 754 arithmetic
    type Float_Single is digits 6 with Size => 4 * Byte_Size, Alignment => 4;
@@ -65,9 +59,5 @@ package Emulator_Kit.Data_Types is
          Exponent at 8 range 0 .. 14;
          Sign_Bit at 8 range 15 .. 15;
       end record;
-
-   -- As extended-precision floats have no clear representation in standard Ada, we will manipulate them by access like SIMD types
-   type Float_Extended_Access is access all Float_Extended;
-   type Float_Extended_Access_Const is access constant Float_Extended;
 
 end Emulator_Kit.Data_Types;

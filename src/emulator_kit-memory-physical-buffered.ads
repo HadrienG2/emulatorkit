@@ -38,22 +38,22 @@ package Emulator_Kit.Memory.Physical.Buffered is
       overriding entry Write (Input : Data_Types.Word; Output_Location : Universal_Address);
       overriding entry Write (Input : Data_Types.Double_Word; Output_Location : Universal_Address);
       overriding entry Write (Input : Data_Types.Quad_Word; Output_Location : Universal_Address);
-      overriding entry Write (Input : Data_Types.Two_Quad_Words_Access_Const; Output_Location : Universal_Address);
-      overriding entry Write (Input : Data_Types.Four_Quad_Words_Access_Const; Output_Location : Universal_Address);
+      overriding entry Write (Input : Data_Types.Two_Quad_Words; Output_Location : Universal_Address);
+      overriding entry Write (Input : Data_Types.Four_Quad_Words; Output_Location : Universal_Address);
       overriding entry Write (Input : Data_Types.Float_Single; Output_Location : Universal_Address);
       overriding entry Write (Input : Data_Types.Float_Double; Output_Location : Universal_Address);
-      overriding entry Write (Input : Data_Types.Float_Extended_Access_Const; Output_Location : Universal_Address);
+      overriding entry Write (Input : Data_Types.Float_Extended; Output_Location : Universal_Address);
 
       -- Element-wise primitive data read
       overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Byte);
       overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Word);
       overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Double_Word);
       overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Quad_Word);
-      overriding entry Read (Input_Location : Universal_Address; Output : Data_Types.Two_Quad_Words_Access);
-      overriding entry Read (Input_Location : Universal_Address; Output : Data_Types.Four_Quad_Words_Access);
+      overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Two_Quad_Words);
+      overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Four_Quad_Words);
       overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Float_Single);
       overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Float_Double);
-      overriding entry Read (Input_Location : Universal_Address; Output : Data_Types.Float_Extended_Access);
+      overriding entry Read (Input_Location : Universal_Address; Output : out Data_Types.Float_Extended);
 
       -- Asynchronous copies within memory and to/from buffers
       overriding entry Start_Copy (Input_Location : Universal_Address;

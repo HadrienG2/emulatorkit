@@ -50,23 +50,25 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                                Volatile => True);
    end Unchecked_Write;
 
-   procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : Data_Types.Two_Quad_Words_Access_Const) is
+   procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : Data_Types.Two_Quad_Words) is
       type Byte_Access is access all Data_Types.Byte;
+      type Qword_Access_Const is access constant Data_Types.Quad_Word;
    begin
       System.Machine_Code.Asm (Template => "movdqa (%0), %%xmm0;" &
                                            "movdqu %%xmm0, (%1)",
-                               Inputs => (Data_Types.Two_Quad_Words_Access_Const'Asm_Input ("r", Input),
+                               Inputs => (Qword_Access_Const'Asm_Input ("r", Input (Input'First)'Access),
                                           Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
                                Clobber => "memory xmm0",
                                Volatile => True);
    end Unchecked_Write;
 
-   procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : Data_Types.Four_Quad_Words_Access_Const) is
+   procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : Data_Types.Four_Quad_Words) is
       type Byte_Access is access all Data_Types.Byte;
+      type Qword_Access_Const is access constant Data_Types.Quad_Word;
    begin
       System.Machine_Code.Asm (Template => "vmovdqa (%0), %%ymm0;" &
                                            "vmovdqu %%ymm0, (%1)",
-                               Inputs => (Data_Types.Four_Quad_Words_Access_Const'Asm_Input ("r", Input),
+                               Inputs => (Qword_Access_Const'Asm_Input ("r", Input (Input'First)'Access),
                                           Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
                                Clobber => "memory ymm0",
                                Volatile => True);
@@ -110,15 +112,16 @@ package body Emulator_Kit.Memory.Byte_Buffers is
 --                                 Volatile => True);
    end Unchecked_Write;
 
-   procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : Data_Types.Float_Extended_Access_Const) is
+   procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : aliased Data_Types.Float_Extended) is
       type Byte_Access is access all Data_Types.Byte;
+      type Float_Extended_Access_Const is access constant Data_Types.Float_Extended;
       St0_Contents : Data_Types.Float_Double; -- See below
    begin
       -- DEBUG : This asm statement is needlessly inefficient. It is made necessary by GNAT's apparent lack of support for x87 clobbers
       System.Machine_Code.Asm (Template => "fldt (%1);" &
                                            "fstpt (%2)",
                                Outputs => Data_Types.Float_Double'Asm_Output ("=t", St0_Contents),
-                               Inputs => (Data_Types.Float_Extended_Access_Const'Asm_Input ("r", Input),
+                               Inputs => (Float_Extended_Access_Const'Asm_Input ("r", Input'Access),
                                           Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
                                Clobber => "memory",
                                Volatile => True);
@@ -155,23 +158,25 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                                Inputs => Byte_Access_Const'Asm_Input ("r", Buffer (Location)'Access));
    end Unchecked_Read;
 
-   procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : Data_Types.Two_Quad_Words_Access) is
+   procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : out Data_Types.Two_Quad_Words) is
       type Byte_Access_Const is access constant Data_Types.Byte;
+      type Qword_Access is access all Data_Types.Quad_Word;
    begin
       System.Machine_Code.Asm (Template => "movdqu (%1), %%xmm0;" &
                                            "movdqa %%xmm0, (%0)",
-                               Inputs => (Data_Types.Two_Quad_Words_Access'Asm_Input ("r", Output),
+                               Inputs => (Qword_Access'Asm_Input ("r", Output (Output'First)'Access),
                                           Byte_Access_Const'Asm_Input ("r", Buffer (Location)'Access)),
                                Clobber => "memory xmm0",
                                Volatile => True);
    end Unchecked_Read;
 
-   procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : Data_Types.Four_Quad_Words_Access) is
+   procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : out Data_Types.Four_Quad_Words) is
       type Byte_Access_Const is access constant Data_Types.Byte;
+      type Qword_Access is access all Data_Types.Quad_Word;
    begin
       System.Machine_Code.Asm (Template => "vmovdqu (%1), %%ymm0;" &
                                            "vmovdqa %%ymm0, (%0)",
-                               Inputs => (Data_Types.Four_Quad_Words_Access'Asm_Input ("r", Output),
+                               Inputs => (Qword_Access'Asm_Input ("r", Output (Output'First)'Access),
                                           Byte_Access_Const'Asm_Input ("r", Buffer (Location)'Access)),
                                Clobber => "memory ymm0",
                                Volatile => True);
@@ -193,15 +198,16 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                                Inputs => Byte_Access_Const'Asm_Input ("r", Buffer (Location)'Access));
    end Unchecked_Read;
 
-   procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : Data_Types.Float_Extended_Access) is
+   procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : aliased out Data_Types.Float_Extended) is
       type Byte_Access_Const is access constant Data_Types.Byte;
+      type Float_Extended_Access is access all Data_Types.Float_Extended;
       St0_Contents : Data_Types.Float_Double; -- See below
    begin
       -- DEBUG : This asm statement is needlessly inefficient. It is made necessary by GNAT's apparent lack of support for x87 clobbers
       System.Machine_Code.Asm (Template => "fldt (%2);" &
                                            "fstpt (%1)",
                                Outputs => Data_Types.Float_Double'Asm_Output ("=t", St0_Contents),
-                               Inputs => (Data_Types.Float_Extended_Access'Asm_Input ("r", Output),
+                               Inputs => (Float_Extended_Access'Asm_Input ("r", Output'Access),
                                           Byte_Access_Const'Asm_Input ("r", Buffer (Location)'Access)),
                                Clobber => "memory",
                                Volatile => True);
@@ -369,9 +375,9 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                   (2 ** (6 * 8)) * Quad_Word (Bytes (14)) +
                   (2 ** (7 * 8)) * Quad_Word (Bytes (15)));
             begin
-               Unchecked_Write (Buffer, 117, Input'Access);
+               Unchecked_Write (Buffer, 117, Input);
                Test_Element_Property (Buffer = Bytes & (42, 42), "Writing two quadwords at the beginning of byte buffers should work");
-               Unchecked_Read (Buffer, 117, Output'Access);
+               Unchecked_Read (Buffer, 117, Output);
                Test_Element_Property (Output = Input, "Reading two quadwords from the beginning of byte buffers should work");
             end;
             Buffer := (others => 42);
@@ -397,9 +403,9 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                   (2 ** (6 * 8)) * Quad_Word (Bytes (14)) +
                   (2 ** (7 * 8)) * Quad_Word (Bytes (15)));
             begin
-               Unchecked_Write (Buffer, 119, Input'Access);
+               Unchecked_Write (Buffer, 119, Input);
                Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing two quadwords at the end of byte buffers should work");
-               Unchecked_Read (Buffer, 119, Output'Access);
+               Unchecked_Read (Buffer, 119, Output);
                Test_Element_Property (Output = Input, "Reading two quadwords from the end of byte buffers should work");
             end;
          end;

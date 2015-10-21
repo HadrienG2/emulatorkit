@@ -244,17 +244,17 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                   end;
                end Write;
             or
-               accept Write (Input : Data_Types.Two_Quad_Words_Access_Const; Output_Location : Universal_Address) do
+               accept Write (Input : Data_Types.Two_Quad_Words; Output_Location : Universal_Address) do
                   declare
-                     Output_Index : constant Byte_Buffer_Index := Checked_Index (Output_Location, To_Bytes (Input.all'Size));
+                     Output_Index : constant Byte_Buffer_Index := Checked_Index (Output_Location, To_Bytes (Input'Size));
                   begin
                      Byte_Buffers.Unchecked_Write (Internal_Buffer.all, Output_Index, Input);
                   end;
                end Write;
             or
-               accept Write (Input : Data_Types.Four_Quad_Words_Access_Const; Output_Location : Universal_Address) do
+               accept Write (Input : Data_Types.Four_Quad_Words; Output_Location : Universal_Address) do
                   declare
-                     Output_Index : constant Byte_Buffer_Index := Checked_Index (Output_Location, To_Bytes (Input.all'Size));
+                     Output_Index : constant Byte_Buffer_Index := Checked_Index (Output_Location, To_Bytes (Input'Size));
                   begin
                      Byte_Buffers.Unchecked_Write (Internal_Buffer.all, Output_Index, Input);
                   end;
@@ -276,11 +276,12 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                   end;
                end Write;
             or
-               accept Write (Input : Data_Types.Float_Extended_Access_Const; Output_Location : Universal_Address) do
+               accept Write (Input : Data_Types.Float_Extended; Output_Location : Universal_Address) do
                   declare
+                     Aliased_Input : aliased constant Data_Types.Float_Extended := Input;
                      Output_Index : constant Byte_Buffer_Index := Checked_Index (Output_Location, To_Bytes (Input'Size));
                   begin
-                     Byte_Buffers.Unchecked_Write (Internal_Buffer.all, Output_Index, Input);
+                     Byte_Buffers.Unchecked_Write (Internal_Buffer.all, Output_Index, Aliased_Input);
                   end;
                end Write;
 
@@ -318,17 +319,17 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                   end;
                end Read;
             or
-               accept Read (Input_Location : Universal_Address; Output : Data_Types.Two_Quad_Words_Access) do
+               accept Read (Input_Location : Universal_Address; Output : out Data_Types.Two_Quad_Words) do
                   declare
-                     Input_Index : constant Byte_Buffer_Index := Checked_Index (Input_Location, To_Bytes (Output.all'Size));
+                     Input_Index : constant Byte_Buffer_Index := Checked_Index (Input_Location, To_Bytes (Output'Size));
                   begin
                      Byte_Buffers.Unchecked_Read (Internal_Buffer.all, Input_Index, Output);
                   end;
                end Read;
             or
-               accept Read (Input_Location : Universal_Address; Output : Data_Types.Four_Quad_Words_Access) do
+               accept Read (Input_Location : Universal_Address; Output : out Data_Types.Four_Quad_Words) do
                   declare
-                     Input_Index : constant Byte_Buffer_Index := Checked_Index (Input_Location, To_Bytes (Output.all'Size));
+                     Input_Index : constant Byte_Buffer_Index := Checked_Index (Input_Location, To_Bytes (Output'Size));
                   begin
                      Byte_Buffers.Unchecked_Read (Internal_Buffer.all, Input_Index, Output);
                   end;
@@ -350,11 +351,13 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                   end;
                end Read;
             or
-               accept Read (Input_Location : Universal_Address; Output : Data_Types.Float_Extended_Access) do
+               accept Read (Input_Location : Universal_Address; Output : out Data_Types.Float_Extended) do
                   declare
-                     Input_Index : constant Byte_Buffer_Index := Checked_Index (Input_Location, To_Bytes (Output.all'Size));
+                     Aliased_Output : aliased Data_Types.Float_Extended;
+                     Input_Index : constant Byte_Buffer_Index := Checked_Index (Input_Location, To_Bytes (Output'Size));
                   begin
-                     Byte_Buffers.Unchecked_Read (Internal_Buffer.all, Input_Index, Output);
+                     Byte_Buffers.Unchecked_Read (Internal_Buffer.all, Input_Index, Aliased_Output);
+                     Output := Aliased_Output;
                   end;
                end Read;
 

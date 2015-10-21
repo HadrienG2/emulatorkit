@@ -39,22 +39,22 @@ package Emulator_Kit.Memory.Abstract_Memory is
    procedure Write (Target : in out Memory_Interface; Input : Data_Types.Word; Output_Location : Universal_Address) is abstract;
    procedure Write (Target : in out Memory_Interface; Input : Data_Types.Double_Word; Output_Location : Universal_Address) is abstract;
    procedure Write (Target : in out Memory_Interface; Input : Data_Types.Quad_Word; Output_Location : Universal_Address) is abstract;
-   procedure Write (Target : in out Memory_Interface; Input : Data_Types.Two_Quad_Words_Access_Const; Output_Location : Universal_Address) is abstract;
-   procedure Write (Target : in out Memory_Interface; Input : Data_Types.Four_Quad_Words_Access_Const; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : in out Memory_Interface; Input : Data_Types.Two_Quad_Words; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : in out Memory_Interface; Input : Data_Types.Four_Quad_Words; Output_Location : Universal_Address) is abstract;
    procedure Write (Target : in out Memory_Interface; Input : Data_Types.Float_Single; Output_Location : Universal_Address) is abstract;
    procedure Write (Target : in out Memory_Interface; Input : Data_Types.Float_Double; Output_Location : Universal_Address) is abstract;
-   procedure Write (Target : in out Memory_Interface; Input : Data_Types.Float_Extended_Access_Const; Output_Location : Universal_Address) is abstract;
+   procedure Write (Target : in out Memory_Interface; Input : Data_Types.Float_Extended; Output_Location : Universal_Address) is abstract;
 
    -- ...and read them to variables
    procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Byte) is abstract;
    procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Word) is abstract;
    procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Double_Word) is abstract;
    procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Quad_Word) is abstract;
-   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Two_Quad_Words_Access) is abstract;
-   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Four_Quad_Words_Access) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Two_Quad_Words) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Four_Quad_Words) is abstract;
    procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Float_Single) is abstract;
    procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Float_Double) is abstract;
-   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : Data_Types.Float_Extended_Access) is abstract;
+   procedure Read (Source : Memory_Interface; Input_Location : Universal_Address; Output : out Data_Types.Float_Extended) is abstract;
 
    -- The interface above is necessary for clean CPU emulation, but not efficient at all, and hence to be avoided for large data transfers.
    -- For these use cases, it is better to use the asynchronous bulk data transfers primitives that are provided below.
