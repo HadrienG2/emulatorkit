@@ -24,7 +24,7 @@ package body Emulator_Kit.Memory is
       if Left < Right then
          raise Illegal_Address;
       else
-         return Universal_Size (Universal_Address'(Right - Left));
+         return Universal_Size (Left) - Universal_Size (Right);
       end if;
    end "-";
 
