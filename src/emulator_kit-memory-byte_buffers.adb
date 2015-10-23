@@ -409,7 +409,110 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                Test_Element_Property (Output = Input, "Reading two quadwords from the end of byte buffers should work");
             end;
          end;
-         -- TODO : Test dqword, fqword, sfloat, dfloat, tfloat
+
+         -- Test 256-bit SIMD I/O
+         declare
+            subtype Quad_Word is Emulator_Kit.Data_Types.Quad_Word;
+            subtype Four_Quad_Words is Emulator_Kit.Data_Types.Four_Quad_Words;
+            use type Quad_Word, Four_Quad_Words;
+            Buffer : Byte_Buffer (110 .. 143) := (others => 42);
+            Output : aliased Four_Quad_Words;
+         begin
+            -- At the beginning of a buffer
+            declare
+               Bytes : constant Byte_Buffer (0 .. 31) := (1, 3, 5, 7, 9, 11, 13, 15,
+                                                          17, 19, 21, 23, 25, 27, 29, 31,
+                                                          33, 35, 37, 39, 41, 43, 45, 47,
+                                                          49, 51, 53, 55, 57, 59, 61, 63);
+               Input : aliased constant Four_Quad_Words :=
+                 (1 => (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (3)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (4)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (5)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (6)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (7)),
+                  2 => (2 ** (0 * 8)) * Quad_Word (Bytes (8)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (9)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (10)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (11)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (12)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (13)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (14)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (15)),
+                 3 => (2 ** (0 * 8)) * Quad_Word (Bytes (16)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (17)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (18)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (19)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (20)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (21)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (22)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (23)),
+                 4 => (2 ** (0 * 8)) * Quad_Word (Bytes (24)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (25)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (26)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (27)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (28)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (29)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (30)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (31)));
+            begin
+               Unchecked_Write (Buffer, 110, Input);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing four quadwords at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 110, Output);
+               Test_Element_Property (Output = Input, "Reading four quadwords from the beginning of byte buffers should work");
+            end;
+            Buffer := (others => 42);
+
+            -- At the end of a buffer
+            declare
+               Bytes : constant Byte_Buffer (0 .. 31) := (4, 8, 12, 16, 20, 24, 28, 32,
+                                                          36, 40, 44, 48, 52, 56, 60, 64,
+                                                          68, 72, 76, 80, 84, 88, 92, 96,
+                                                          100, 104, 108, 112, 116, 120, 124, 128);
+               Input : aliased constant Four_Quad_Words :=
+                 (1 => (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (3)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (4)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (5)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (6)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (7)),
+                  2 => (2 ** (0 * 8)) * Quad_Word (Bytes (8)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (9)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (10)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (11)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (12)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (13)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (14)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (15)),
+                 3 => (2 ** (0 * 8)) * Quad_Word (Bytes (16)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (17)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (18)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (19)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (20)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (21)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (22)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (23)),
+                 4 => (2 ** (0 * 8)) * Quad_Word (Bytes (24)) +
+                  (2 ** (1 * 8)) * Quad_Word (Bytes (25)) +
+                  (2 ** (2 * 8)) * Quad_Word (Bytes (26)) +
+                  (2 ** (3 * 8)) * Quad_Word (Bytes (27)) +
+                  (2 ** (4 * 8)) * Quad_Word (Bytes (28)) +
+                  (2 ** (5 * 8)) * Quad_Word (Bytes (29)) +
+                  (2 ** (6 * 8)) * Quad_Word (Bytes (30)) +
+                  (2 ** (7 * 8)) * Quad_Word (Bytes (31)));
+            begin
+               Unchecked_Write (Buffer, 112, Input);
+               Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing four quadwords at the end of byte buffers should work");
+               Unchecked_Read (Buffer, 112, Output);
+               Test_Element_Property (Output = Input, "Reading four quadwords from the end of byte buffers should work");
+            end;
+         end;
+
+         -- TODO : Test sfloat, dfloat, tfloat
       end Test_Byte_Buffer;
 
       procedure Test_Byte_Buffers_Package is
