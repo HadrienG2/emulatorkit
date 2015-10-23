@@ -71,4 +71,11 @@ package body Emulator_Kit.Debug.Test is
       raise Test_Failed;
    end Fail_Test;
 
+begin
+
+   -- Display a message telling the user what's going on with all the tests
+   if Test_On_Elaboration then
+      Debug.Message ("Automated tests are enabled. To turn them off, please set Emulator_Kit.Debug.Test.Test_On_Elaboration to FALSE.");
+   end if;
+
 end Emulator_Kit.Debug.Test;
