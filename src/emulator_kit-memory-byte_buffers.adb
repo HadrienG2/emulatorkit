@@ -352,12 +352,12 @@ package body Emulator_Kit.Memory.Byte_Buffers is
             subtype Two_Quad_Words is Emulator_Kit.Data_Types.Two_Quad_Words;
             use type Quad_Word, Two_Quad_Words;
             Buffer : Byte_Buffer (117 .. 134) := (others => 42);
-            Output : aliased Two_Quad_Words;
+            Output : Two_Quad_Words;
          begin
             -- At the beginning of a buffer
             declare
                Bytes : constant Byte_Buffer (0 .. 15) := (2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32);
-               Input : aliased constant Two_Quad_Words :=
+               Input : constant Two_Quad_Words :=
                  (1 => (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
                   (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
                   (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
@@ -385,7 +385,7 @@ package body Emulator_Kit.Memory.Byte_Buffers is
             -- At the end of a buffer
             declare
                Bytes : constant Byte_Buffer (0 .. 15) := (3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33);
-               Input : aliased constant Two_Quad_Words :=
+               Input : constant Two_Quad_Words :=
                  (1 => (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
                   (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
                   (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
@@ -416,7 +416,7 @@ package body Emulator_Kit.Memory.Byte_Buffers is
             subtype Four_Quad_Words is Emulator_Kit.Data_Types.Four_Quad_Words;
             use type Quad_Word, Four_Quad_Words;
             Buffer : Byte_Buffer (110 .. 143) := (others => 42);
-            Output : aliased Four_Quad_Words;
+            Output : Four_Quad_Words;
          begin
             -- At the beginning of a buffer
             declare
@@ -424,7 +424,7 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                                                           17, 19, 21, 23, 25, 27, 29, 31,
                                                           33, 35, 37, 39, 41, 43, 45, 47,
                                                           49, 51, 53, 55, 57, 59, 61, 63);
-               Input : aliased constant Four_Quad_Words :=
+               Input : constant Four_Quad_Words :=
                  (1 => (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
                   (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
                   (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
@@ -471,7 +471,7 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                                                           36, 40, 44, 48, 52, 56, 60, 64,
                                                           68, 72, 76, 80, 84, 88, 92, 96,
                                                           100, 104, 108, 112, 116, 120, 124, 128);
-               Input : aliased constant Four_Quad_Words :=
+               Input : constant Four_Quad_Words :=
                  (1 => (2 ** (0 * 8)) * Quad_Word (Bytes (0)) +
                   (2 ** (1 * 8)) * Quad_Word (Bytes (1)) +
                   (2 ** (2 * 8)) * Quad_Word (Bytes (2)) +
@@ -512,13 +512,128 @@ package body Emulator_Kit.Memory.Byte_Buffers is
             end;
          end;
 
-         -- TODO : Test sfloat, dfloat, tfloat
+         -- Test single-precision float I/O
+         declare
+            subtype Float_Single is Emulator_Kit.Data_Types.Float_Single;
+            use type Float_Single;
+            Buffer : Byte_Buffer (63 .. 68) := (others => 42);
+            Output : Float_Single;
+         begin
+            -- At the beginning of a buffer
+            declare
+               Input : constant Float_Single := 0.3;
+               Bytes : constant Byte_Buffer (0 .. 3) := (2#10011010#, 2#10011001#, 2#10011001#, 2#00111110#);
+            begin
+               Unchecked_Write (Buffer, 63, Input);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing single-precision floats at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 63, Output);
+               Test_Element_Property (Output = Input, "Reading single-precision floats from the beginning of byte buffers should work");
+            end;
+            Buffer := (others => 42);
+
+            -- At the end of a buffer
+            declare
+               Input : constant Float_Single := -0.33;
+               Bytes : constant Byte_Buffer (0 .. 3) := (2#11000011#, 2#11110101#, 2#10101000#, 2#10111110#);
+            begin
+               Unchecked_Write (Buffer, 65, Input);
+               Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing single-precision floats at the end of byte buffers should work");
+               Unchecked_Read (Buffer, 65, Output);
+               Test_Element_Property (Output = Input, "Reading single-precision floats from the end of byte buffers should work");
+            end;
+         end;
+
+         -- Test double precision float I/O
+         declare
+            subtype Float_Double is Emulator_Kit.Data_Types.Float_Double;
+            use type Float_Double;
+            Buffer : Byte_Buffer (83 .. 92) := (others => 42);
+            Output : Float_Double;
+         begin
+            -- At the beginning of a buffer
+            declare
+               Input : constant Float_Double := 0.333;
+               Bytes : constant Byte_Buffer (0 .. 7) := (16#1D#, 16#5A#, 16#64#, 16#3B#, 16#DF#, 16#4F#, 16#D5#, 16#3F#);
+            begin
+               Unchecked_Write (Buffer, 83, Input);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing double-precision floats at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 83, Output);
+               Test_Element_Property (Output = Input, "Reading double-precision floats from the beginning of byte buffers should work");
+            end;
+            Buffer := (others => 42);
+
+            -- At the end of a buffer
+            declare
+               Input : constant Float_Double := -0.3333; -- 69 6F F0 85 C9 54 D5 BF
+               Bytes : constant Byte_Buffer (0 .. 7) := (16#69#, 16#6F#, 16#F0#, 16#85#, 16#C9#, 16#54#, 16#D5#, 16#BF#);
+            begin
+               Unchecked_Write (Buffer, 85, Input);
+               Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing double-precision floats at the end of byte buffers should work");
+               Unchecked_Read (Buffer, 85, Output);
+               Test_Element_Property (Output = Input, "Reading double-precision floats from the end of byte buffers should work");
+            end;
+         end;
+
+         -- Test extended-precision float I/O
+         declare
+            subtype Float_Extended is Emulator_Kit.Data_Types.Float_Extended;
+            use type Float_Extended;
+            Buffer : Byte_Buffer (117 .. 128) := (others => 42);
+            Output : aliased Float_Extended;
+         begin
+            -- At the beginning of a buffer
+            declare
+               Input : aliased constant Float_Extended := (Fraction => 2#0101101_11001011_00111100_11011111_11011101_11101110_10100110_10101101#,
+                                                           Integer_Bit => False,
+                                                           Exponent => 2#1101101_00110101#,
+                                                           Sign_Bit => True);
+               Bytes : constant Byte_Buffer (0 .. 9) := (2#10101101#, -- Fraction least significant byte
+                                                         2#10100110#,
+                                                         2#11101110#,
+                                                         2#11011101#,
+                                                         2#11011111#,
+                                                         2#00111100#,
+                                                         2#11001011#,
+                                                         2#0_0101101#, -- Integer bit + last 7 bits of fraction
+                                                         2#00110101#, -- First exponent byte
+                                                         2#1_1101101#); -- Sign bit + last 7 bits of exponent
+            begin
+               Unchecked_Write (Buffer, 117, Input);
+               Test_Element_Property (Buffer = Bytes & (42, 42), "Writing extended-precision floats at the beginning of byte buffers should work");
+               Unchecked_Read (Buffer, 117, Output);
+               Test_Element_Property (Output = Input, "Reading extended-precision floats from the beginning of byte buffers should work");
+            end;
+            Buffer := (others => 42);
+
+            -- At the end of a buffer
+            declare
+               Input : aliased constant Float_Extended := (Fraction => 2#1010101_00101110_11011100_00111010_10011110_11101101_01010101_10101010#,
+                                                           Integer_Bit => False,
+                                                           Exponent => 2#1111001_01010101#,
+                                                           Sign_Bit => False);
+               Bytes : constant Byte_Buffer (0 .. 9) := (2#10101010#, -- Fraction least significant byte
+                                                         2#01010101#,
+                                                         2#11101101#,
+                                                         2#10011110#,
+                                                         2#00111010#,
+                                                         2#11011100#,
+                                                         2#00101110#,
+                                                         2#0_1010101#, -- Integer bit + last 7 bits of fraction
+                                                         2#01010101#, -- First exponent byte
+                                                         2#0_1111001#); -- Sign bit + last 7 bits of exponent
+            begin
+               Unchecked_Write (Buffer, 119, Input);
+               Test_Element_Property (Buffer = (42, 42) & Bytes, "Writing extended-precision floats at the end of byte buffers should work");
+               Unchecked_Read (Buffer, 119, Output);
+               Test_Element_Property (Output = Input, "Reading extended-precision floats from the end of byte buffers should work");
+            end;
+         end;
       end Test_Byte_Buffer;
 
       procedure Test_Byte_Buffers_Package is
       begin
          Test_Package_Element (To_Entity_Name ("Byte_Buffer"), Test_Byte_Buffer'Access);
-         -- TODO : Test_Package_Element (To_Entity_Name ("Shared_Byte_Buffers"), Test_Shared_Byte_Buffers'Access);
+         -- NOTE : Shared byte buffers are not tested here, because the relevant shared package is already tested in Emulator_Kit.Tasking.Processes.
       end Test_Byte_Buffers_Package;
    begin
       Test_Package (To_Entity_Name ("Memory.Byte_Buffers"), Test_Byte_Buffers_Package'Access);
