@@ -26,9 +26,6 @@ package Emulator_Kit.Debug is
    -- Display a debug message featuring task identification information
    procedure Task_Message (Contents : String);
 
-   -- Display a debug message reporting an unhandled exception
-   procedure Message_Unhandled_Exception (Occurrence : Ada.Exceptions.Exception_Occurrence);
-
    -- Display a debug message reporting an unhandled exception within a task
    procedure Task_Message_Unhandled_Exception (Occurrence : Ada.Exceptions.Exception_Occurrence);
 

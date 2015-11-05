@@ -31,13 +31,6 @@ package body Emulator_Kit.Debug is
       Ada.Text_IO.Put_Line ("DEBUG FROM " & Image (Current_Task) & " : " & Contents);
    end Task_Message;
 
-   procedure Message_Unhandled_Exception (Occurrence : Ada.Exceptions.Exception_Occurrence) is
-   begin
-      Message ("Unhandled exception of type " &
-                 Ada.Exceptions.Exception_Name (Occurrence) & ", with message """ &
-                 Ada.Exceptions.Exception_Message (Occurrence) & """ ! Aborting...");
-   end Message_Unhandled_Exception;
-
    procedure Task_Message_Unhandled_Exception (Occurrence : Ada.Exceptions.Exception_Occurrence) is
    begin
       Task_Message ("Unhandled exception of type " &
