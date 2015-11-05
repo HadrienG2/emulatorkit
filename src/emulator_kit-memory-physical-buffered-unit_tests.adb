@@ -138,11 +138,53 @@ package body Emulator_Kit.Memory.Physical.Buffered.Unit_Tests is
             end;
          end;
 
-         -- TODO : Test 128-bit SIMD I/O
-         -- TODO : Test 256-bit SIMD I/O
-         -- TODO : Test single-precision float I/O
-         -- TODO : Test double-precision float I/O
-         -- TODO : Test extended-precision float I/O
+         -- Test quadword I/O
+         declare
+            type Quad_Word_Buffer is array (Positive range <>) of Data_Types.Quad_Word;
+            Output_Quad_Words : Quad_Word_Buffer (1 .. 2);
+         begin
+            -- At the beginning of memory
+            declare
+               Test_Quad_Words : constant Quad_Word_Buffer (1 .. 2) := (16#FEDC_BA98_7654_3210#, 16#1357_9BDF_0246_8ACE#);
+            begin
+               Buffer_Mem.Write (Test_Quad_Words (1), 0);
+               Buffer_Mem.Write (Test_Quad_Words (2), 8);
+               Buffer_Mem.Read (0, Output_Quad_Words (1));
+               Buffer_Mem.Read (8, Output_Quad_Words (2));
+               Test_Element_Property (Test_Quad_Words = Output_Quad_Words, "Writing quadwords at the beginning of memory should work");
+            end;
+
+            -- At the end of memory (including out of bounds)
+            declare
+               Test_Quad_Words : constant Quad_Word_Buffer (1 .. 2) := (16#2468_ACE0_1357_9BDF#, 16#DEAD_BEEF_BADB_0053#);
+            begin
+               Buffer_Mem.Write (Test_Quad_Words (1), Universal_Address (Buffer_Mem.Buffer_Size - 8));
+               Buffer_Mem.Write (Test_Quad_Words (2), Universal_Address (Buffer_Mem.Buffer_Size - 16));
+               Buffer_Mem.Read (Universal_Address (Buffer_Mem.Buffer_Size - 8), Output_Quad_Words (1));
+               Buffer_Mem.Read (Universal_Address (Buffer_Mem.Buffer_Size - 16), Output_Quad_Words (2));
+               Test_Element_Property (Test_Quad_Words = Output_Quad_Words, "Writing doublewords at the end of memory should work");
+
+               begin
+                  Buffer_Mem.Write (Test_Quad_Words (1), Universal_Address (Buffer_Mem.Buffer_Size - 7));
+                  Fail_Test ("Writing beyond the end of memory should raise an exception");
+               exception
+                  when Illegal_Address => null;
+               end;
+
+               begin
+                  Buffer_Mem.Read (Universal_Address (Buffer_Mem.Buffer_Size - 7), Output_Quad_Words (1));
+                  Fail_Test ("Reading beyond the end of memory should raise an exception");
+               exception
+                  when Illegal_Address => null;
+               end;
+            end;
+         end;
+
+         -- TODO : Test 128-bit I/O
+         -- TODO : Test 256-bit I/O
+         -- TODO : Test single precision float I/O
+         -- TODO : Test double precision float I/O
+         -- TODO : Test extended precision float I/O
 
          -- TODO : Test asynchronous byte transfers
          -- TODO : Test asynchronous byte streams
