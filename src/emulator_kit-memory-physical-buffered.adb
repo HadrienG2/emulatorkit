@@ -464,9 +464,8 @@ package body Emulator_Kit.Memory.Physical.Buffered is
             end select;
 
          exception
-             -- These exceptions are considered non-fatal, as they are the client's fault. They solely result into a debug message being printed.
-            when Illegal_Address => Debug.Task_Message ("Rejected illegal memory access");
-            when Byte_Buffers.Buffer_Overflow => Debug.Task_Message ("Rejected overflowing buffer access");
+             -- These exceptions are considered non-fatal, as they originate from silly client requests.
+            when Illegal_Address | Byte_Buffers.Buffer_Overflow => null;
          end;
       end loop;
 

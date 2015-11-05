@@ -75,7 +75,7 @@ begin
 
    -- Display a message telling the user what's going on with all the tests
    if Test_On_Elaboration then
-      Debug.Message ("Automated tests are enabled. To turn them off, please set Emulator_Kit.Debug.Test.Test_On_Elaboration to FALSE.");
+      Debug.Message ("Automated unit testing is enabled. To turn it off, please set Emulator_Kit.Debug.Test.Test_On_Elaboration to FALSE.");
    end if;
 
 end Emulator_Kit.Debug.Test;
