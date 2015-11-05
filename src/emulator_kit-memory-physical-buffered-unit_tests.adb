@@ -96,9 +96,57 @@ package body Emulator_Kit.Memory.Physical.Buffered.Unit_Tests is
             end;
          end;
 
-         -- TODO : Test primitive data type I/O
+         -- Test doubleword I/O
+         declare
+            type Double_Word_Buffer is array (Positive range <>) of Data_Types.Double_Word;
+            Output_Double_Words : Double_Word_Buffer (1 .. 2);
+         begin
+            -- At the beginning of memory
+            declare
+               Test_Double_Words : constant Double_Word_Buffer (1 .. 2) := (123456789, 246813579);
+            begin
+               Buffer_Mem.Write (Test_Double_Words (1), 0);
+               Buffer_Mem.Write (Test_Double_Words (2), 4);
+               Buffer_Mem.Read (0, Output_Double_Words (1));
+               Buffer_Mem.Read (4, Output_Double_Words (2));
+               Test_Element_Property (Test_Double_Words = Output_Double_Words, "Writing doublewords at the beginning of memory should work");
+            end;
+
+            -- At the end of memory (including out of bounds)
+            declare
+               Test_Double_Words : constant Double_Word_Buffer (1 .. 2) := (321987654, 129834765);
+            begin
+               Buffer_Mem.Write (Test_Double_Words (1), Universal_Address (Buffer_Mem.Buffer_Size - 4));
+               Buffer_Mem.Write (Test_Double_Words (2), Universal_Address (Buffer_Mem.Buffer_Size - 8));
+               Buffer_Mem.Read (Universal_Address (Buffer_Mem.Buffer_Size - 4), Output_Double_Words (1));
+               Buffer_Mem.Read (Universal_Address (Buffer_Mem.Buffer_Size - 8), Output_Double_Words (2));
+               Test_Element_Property (Test_Double_Words = Output_Double_Words, "Writing doublewords at the end of memory should work");
+
+               begin
+                  Buffer_Mem.Write (Test_Double_Words (1), Universal_Address (Buffer_Mem.Buffer_Size - 3));
+                  Fail_Test ("Writing beyond the end of memory should raise an exception");
+               exception
+                  when Illegal_Address => null;
+               end;
+
+               begin
+                  Buffer_Mem.Read (Universal_Address (Buffer_Mem.Buffer_Size - 3), Output_Double_Words (1));
+                  Fail_Test ("Reading beyond the end of memory should raise an exception");
+               exception
+                  when Illegal_Address => null;
+               end;
+            end;
+         end;
+
+         -- TODO : Test 128-bit SIMD I/O
+         -- TODO : Test 256-bit SIMD I/O
+         -- TODO : Test single-precision float I/O
+         -- TODO : Test double-precision float I/O
+         -- TODO : Test extended-precision float I/O
+
          -- TODO : Test asynchronous byte transfers
          -- TODO : Test asynchronous byte streams
+         Fail_Test ("This test suite is not extensive enough yet");
       end Test_Buffer_Memory;
 
       procedure Test_Buffered_Package is
