@@ -16,6 +16,8 @@
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
 with Emulator_Kit.Debug;
+with Emulator_Kit.Debug.Test;
+with Emulator_Kit.Memory.Physical.Buffered.Unit_Tests;
 
 package body Emulator_Kit.Memory.Physical.Buffered is
 
@@ -474,5 +476,10 @@ package body Emulator_Kit.Memory.Physical.Buffered is
          Debug.Task_Message_Unhandled_Exception (Occurrence);
          raise;
    end Buffer_Memory;
+
+begin
+
+   -- Automatically test the package when it is included
+   Debug.Test.Elaboration_Self_Test (Unit_Tests.Run_Tests'Access);
 
 end Emulator_Kit.Memory.Physical.Buffered;
