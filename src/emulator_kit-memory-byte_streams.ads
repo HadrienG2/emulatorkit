@@ -60,7 +60,7 @@ package Emulator_Kit.Memory.Byte_Streams is
       -- Client interface
       --   * Exceptions
       function Exception_Pending return Boolean;
-      procedure Fetch_Exception;
+      procedure Fetch_Exception with No_Return;
       --   * Stream end
       procedure Request_Stop;
       function At_End return Boolean;  -- NOTE : Do not count on this to prevent Read/Write procedures from raising an exception...
@@ -81,6 +81,9 @@ package Emulator_Kit.Memory.Byte_Streams is
       function Seek_Address return Universal_Address;
       procedure Notify_Seek_Completion;
 
+      -- These state-probing functions are intended to help with testing, and not meant to be used directly
+      function Clients_Waiting_For_Seek return Natural;
+      function Servers_Waiting_For_Exception_Fetch return Natural;
    private
       -- Stream data is stored in a ring buffer
       Ring_Buffer : Byte_Buffer (0 .. Buffer_Size); -- Allocate one extra byte, which will not be used, to disambiguate full and empty buffers
@@ -92,7 +95,7 @@ package Emulator_Kit.Memory.Byte_Streams is
       Seek_Destination : Universal_Address;
       Client_Exception : Ada.Exceptions.Exception_Occurrence;
 
-      -- These hidden entries are used to synchronize clients and servers
+      -- These hidden entries are used to synchronize clients and servers.
       entry Wait_For_Seek;
       entry Wait_For_Exception_Fetch;
    end Byte_Stream;
@@ -104,6 +107,6 @@ package Emulator_Kit.Memory.Byte_Streams is
    function Is_Valid (Handle : Byte_Stream_Handle) return Boolean renames Shared_Byte_Streams.Is_Valid;
    function Target (Handle : Byte_Stream_Handle) return not null Byte_Stream_Access renames Shared_Byte_Streams.Target;
    function Make_Byte_Stream (Buffer_Size : Byte_Buffer_Size; Chunk_Size : Byte_Buffer_Size) return Byte_Stream_Handle is
-      (Shared_Byte_Streams.Make_Shared (new Byte_Stream (Buffer_Size, Chunk_Size)));
+     (Shared_Byte_Streams.Make_Shared (new Byte_Stream (Buffer_Size, Chunk_Size)));
 
 end Emulator_Kit.Memory.Byte_Streams;

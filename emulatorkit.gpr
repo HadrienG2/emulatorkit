@@ -3,9 +3,20 @@ project EmulatorKit is
    for Source_Dirs use ("src");
    for Object_Dir use "obj";
    for Main use ("main.adb");
+   type Build_Mode_Type is
+      ("Test_Coverage", "Optimized_With_Checks");
+   Build_Mode : Build_Mode_Type := external ("Build_Mode", "Optimized_With_Checks");
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatwea.w.s.k.fh", "-gnatVa", "-gnatytIkxuSrpOnlihfeBbAa", "-g", "-fstack-check", "-gnat12", "-gnato", "-gnata", "-O3", "-gnatn", "-funroll-loops", "-gnatE", "-gnatf");
+
+      case Build_Mode is
+
+         when "Test_Coverage" =>
+            for Default_Switches ("ada") use ("-gnatwea.w.s.k.fh", "-gnatVa", "-gnatytIkxuSrpOnlihfeBbAa", "-g", "-fstack-check", "-gnat12", "-gnato", "-gnata", "-gnatE", "-gnatf", "-ftest-coverage", "-fprofile-arcs");
+
+         when "Optimized_With_Checks" =>
+            for Default_Switches ("ada") use ("-gnatwea.w.s.k.fh", "-gnatVa", "-gnatytIkxuSrpOnlihfeBbAa", "-g", "-fstack-check", "-gnat12", "-gnato", "-gnata", "-O3", "-gnatn", "-funroll-loops", "-gnatE", "-gnatf");
+      end case;
    end Compiler;
 
    package Builder is
@@ -13,7 +24,15 @@ project EmulatorKit is
    end Builder;
 
    package Linker is
-      for Default_Switches ("ada") use ("-g");
+
+      case Build_Mode is
+
+         when "Test_Coverage" =>
+            for Default_Switches ("ada") use ("-g", "-fprofile-generate");
+
+         when "Optimized_With_Checks" =>
+            for Default_Switches ("ada") use ("-g");
+      end case;
    end Linker;
 
 end EmulatorKit;

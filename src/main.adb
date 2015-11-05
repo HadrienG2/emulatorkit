@@ -58,8 +58,8 @@ procedure Main is
 
    -- This sample program allows one to compare the same task (filling 2GB of RAM, copying the first GB to the second GB, and fetching the result back)
    -- being performed using buffers and streams. On my machine, the stream version runs about 30% faster due to its extra concurrency.
-   type Mode is (Buffer, Stream);
-   Active_Mode : constant Mode := Stream;
+   type Mode is (Buffer, Stream, No_Op);
+   Active_Mode : constant Mode := No_Op;
 
    function Gen_Byte (Index : Byte_Buffer_Index) return Data_Types.Byte is (Data_Types.Byte (Byte_Buffer_Index (Index - 1) * 256 / Mem_Size));
 begin
@@ -157,6 +157,9 @@ begin
             end;
          end;
 
+      when No_Op =>
+         null;
+
    end case;
-   Text_IO.Put_Line ("Done");
+   Text_IO.Put_Line ("All done !");
 end Main;

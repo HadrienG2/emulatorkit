@@ -162,10 +162,10 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                            Location : constant Universal_Address := Stream_Handle.Target.Seek_Address;
                         begin
                            Buffer_Index := Checked_Index (Location, Universal_Size (Chunk_Size));
-                           Stream_Handle.Target.Notify_Seek_Completion;
                         exception
                            when Occurrence : Illegal_Address => Stream_Handle.Target.Notify_Exception (Occurrence);
                         end;
+                        Stream_Handle.Target.Notify_Seek_Completion;
 
                      when Byte_Streams.Stop =>
                         exit Stream_Loop;
