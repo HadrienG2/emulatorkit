@@ -17,7 +17,7 @@
 
 with Ada.Exceptions;
 
--- This package provides debugging functionality
+-- This package hierarchy provides debugging functionality
 package Emulator_Kit.Debug is
 
    -- Display a debug message

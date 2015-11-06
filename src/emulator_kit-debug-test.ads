@@ -18,6 +18,7 @@
 with Ada.Strings;
 with Ada.Strings.Bounded;
 
+-- This package provides a simple unit test runner
 package Emulator_Kit.Debug.Test is
 
    -- If a test does not pass, it will raise this exception
