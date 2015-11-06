@@ -35,5 +35,18 @@ project EmulatorKit is
       end case;
    end Linker;
 
+   package Binder is
+
+      case Build_Mode is
+
+         when "Test_Coverage" =>
+            for Default_Switches ("ada") use ("-E");
+
+         when "Optimized_With_Checks" =>
+            for Default_Switches ("ada") use ("-E");
+
+      end case;
+   end Binder;
+
 end EmulatorKit;
 

@@ -16,6 +16,7 @@
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
 with Ada.Task_Identification;
+with Ada.Characters.Latin_1;
 with Ada.Text_IO;
 
 package body Emulator_Kit.Debug is
@@ -33,9 +34,8 @@ package body Emulator_Kit.Debug is
 
    procedure Task_Message_Unhandled_Exception (Occurrence : Ada.Exceptions.Exception_Occurrence) is
    begin
-      Task_Message ("Unhandled exception of type " &
-                      Ada.Exceptions.Exception_Name (Occurrence) & ", with message """ &
-                      Ada.Exceptions.Exception_Message (Occurrence) & """. Aborting...");
+      Task_Message ("An unhandled exception occured ! Implementation-specific information follows :" & Ada.Characters.Latin_1.LF & Ada.Characters.Latin_1.LF &
+                      Ada.Exceptions.Exception_Information (Occurrence));
    end Task_Message_Unhandled_Exception;
 
 end Emulator_Kit.Debug;
