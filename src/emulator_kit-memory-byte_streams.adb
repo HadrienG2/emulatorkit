@@ -357,6 +357,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             exception
                when Occurrence : others =>
                   Debug.Task_Message_Unhandled_Exception (Occurrence);
+                  raise;
             end Client;
 
             task body Server is
@@ -375,6 +376,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             exception
                when Occurrence : others =>
                   Debug.Task_Message_Unhandled_Exception (Occurrence);
+                  raise;
             end Server;
          begin
             select
@@ -429,6 +431,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             exception
                when Occurrence : others =>
                   Debug.Task_Message_Unhandled_Exception (Occurrence);
+                  raise;
             end Client;
 
             task body Server is
@@ -451,6 +454,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             exception
                when Occurrence : others =>
                   Debug.Task_Message_Unhandled_Exception (Occurrence);
+                  raise;
             end Server;
          begin
             select
@@ -512,6 +516,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             exception
                when Occurrence : others =>
                   Debug.Task_Message_Unhandled_Exception (Occurrence);
+                  raise;
             end Client;
 
             task body Server is
@@ -532,6 +537,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             exception
                when Occurrence : others =>
                   Debug.Task_Message_Unhandled_Exception (Occurrence);
+                  raise;
             end Server;
          begin
             select
