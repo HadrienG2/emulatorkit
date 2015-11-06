@@ -398,38 +398,117 @@ package body Emulator_Kit.Memory.Abstract_Memory is
          end;
       end;
 
-      -- Test memory transfers between host and guest memory
+      -- Test asynchronous memory transfers
       declare
          use type Byte_Buffers.Byte_Buffer, Byte_Buffers.Byte_Buffer_Index;
          Input : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Min_Index => 3,
                                                                                Max_Index => Byte_Buffer_Size (Instance_Size + 2));
+         Copy_Process_Handle : Process_Handle;
       begin
-         -- Initialize an input buffer that is as large as guest memory
-         for I in Input.Target.all'Range loop
-            Input.Target.all (I) := Data_Types.Byte ((3 * I + 1) mod 256);
+         -- Initialize a shared input buffer that is as large as guest memory
+         for I in Input.Target'Range loop
+            Input.Target (I) := Data_Types.Byte ((3 * I + 1) mod 256);
          end loop;
 
          -- Try to send it to guest memory and fetch it back
-         -- TODO : Add extra checks to ensure that if the memory task hangs, we won't hang too
          declare
-            Copy_Process_Handle : Process_Handle;
             Output : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Min_Index => 5,
                                                                                    Max_Index => Byte_Buffer_Size (Instance_Size + 4));
          begin
+            -- Try to round trip our input buffer between host and guest
+            select
+               -- Give our tasks 1s to perform the memory copy
+               delay 1.0;
+               Fail_Test ("Memory copies are taking too long, memory manager probably hung");
+            then abort
+               -- Perform a memory round trip
+               Instance.Start_Copy (Input           => Input,
+                                    Output_Location => 0,
+                                    Byte_Count      => Instance_Size,
+                                    Process         => Copy_Process_Handle);
+               Copy_Process_Handle.Target.Wait_For_Completion;
+               Instance.Start_Copy (Input_Location => 0,
+                                    Output         => Output,
+                                    Byte_Count     => Instance_Size,
+                                    Process        => Copy_Process_Handle);
+               Copy_Process_Handle.Target.Wait_For_Completion;
+            end select;
+
+            -- Check that we got the same block of memory that we initially sent
+            Test_Element_Property (Input.Target.all = Output.Target.all, "Full-memory copies should work as expected");
+         end;
+
+         -- Check that the memory subsystem rejects incorrect host/guest requests, such as writes that go beyond address space limits...
+         begin
             Instance.Start_Copy (Input           => Input,
+                                 Output_Location => 1,
+                                 Byte_Count      => Instance_Size,
+                                 Process         => Copy_Process_Handle);
+            Fail_Test ("Out of bounds writes should be rejected at request time");
+         exception
+            when Illegal_Address => null;
+         end;
+
+         -- ...overflowing memory writes...
+         declare
+            Overly_Small_Input : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Min_Index => 7,
+                                                                                               Max_Index => Byte_Buffer_Size (Instance_Size - 7));
+         begin
+            Instance.Start_Copy (Input           => Overly_Small_Input,
                                  Output_Location => 0,
                                  Byte_Count      => Instance_Size,
                                  Process         => Copy_Process_Handle);
-            Copy_Process_Handle.Target.Wait_For_Completion;
+            Fail_Test ("Overflowing memory writes should be rejected at request time");
+         exception
+            when Byte_Buffers.Buffer_Overflow => null;
+         end;
+
+         -- ...and overflowing memory reads...
+         declare
+            Overly_Small_Output : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Min_Index => 1,
+                                                                                                Max_Index => Byte_Buffer_Size (Instance_Size - 1));
+         begin
             Instance.Start_Copy (Input_Location => 0,
-                                 Output         => Output,
+                                 Output         => Overly_Small_Output,
                                  Byte_Count     => Instance_Size,
                                  Process        => Copy_Process_Handle);
-            Copy_Process_Handle.Target.Wait_For_Completion;
-            Test_Element_Property (Input.Target.all = Output.Target.all, "Full-memory copies should work");
+            Fail_Test ("Overflowing memory reads should be rejected at request time");
+         exception
+            when Byte_Buffers.Buffer_Overflow => null;
+         end;
+
+         -- Test internal memory transfers
+         declare
+            subtype Byte_Buffer_Index is Byte_Buffers.Byte_Buffer_Index;
+            Half_Of_Memory : constant Universal_Size := Instance_Size / 2;
+            Destination : constant Universal_Address := Universal_Address (Half_Of_Memory);
+            Output : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Byte_Buffer_Size (Half_Of_Memory));
+            First_Input_Index : constant Byte_Buffer_Index := Input.Target.all'First;
+         begin
+            -- Copy the first half of memory to its second half
+            select
+               -- Give our tasks 1s to perform the memory copy
+               delay 1.0;
+               Fail_Test ("Memory copies are taking too long, memory manager probably hung");
+            then abort
+               -- Perform the internal copy, then check out its results
+               Instance.Start_Copy (Input_Location  => 0,
+                                    Output_Location => Destination,
+                                    Byte_Count      => Half_Of_Memory,
+                                    Process         => Copy_Process_Handle);
+               Copy_Process_Handle.Target.Wait_For_Completion;
+               Instance.Start_Copy (Input_Location => Destination,
+                                    Output         => Output,
+                                    Byte_Count     => Half_Of_Memory,
+                                    Process        => Copy_Process_Handle);
+               Copy_Process_Handle.Target.Wait_For_Completion;
+            end select;
+
+            -- Check that the copies went well
+            Test_Element_Property (Input.Target (First_Input_Index .. First_Input_Index + Byte_Buffer_Size (Half_Of_Memory) - 1) = Output.Target.all,
+                                   "Internal memory copies should work as expected");
          end;
       end;
-      -- TODO : Test memory transfers within guest memory
 
       -- TODO : Test asynchronous byte streams
       Fail_Test ("This test suite is not extensive enough yet");

@@ -484,11 +484,11 @@ package body Emulator_Kit.Memory.Physical.Buffered is
       use Emulator_Kit.Debug.Test;
 
       procedure Test_Buffer_Memory is
-         Buffer_Mem : Buffer_Memory (256); -- This amount of memory makes for nice test patterns
+         Buffer_Mem : Buffer_Memory (4 * 1024);
          Advertised_Size : Universal_Size;
       begin
          Buffer_Mem.Get_Size (Advertised_Size);
-         Test_Element_Property (Advertised_Size = Universal_Size (Buffer_Mem.Buffer_Size), "Buffer memory should advertise the right size");
+         Test_Element_Property (Advertised_Size = Universal_Size (Buffer_Mem.Buffer_Size), "Buffer memory should advertise its actual size");
          Abstract_Memory.Test_Instance (Buffer_Mem);
       end Test_Buffer_Memory;
 

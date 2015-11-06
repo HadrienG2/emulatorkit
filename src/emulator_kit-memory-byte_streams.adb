@@ -377,28 +377,22 @@ package body Emulator_Kit.Memory.Byte_Streams is
                   Debug.Task_Message_Unhandled_Exception (Occurrence);
             end Server;
          begin
-            -- Have our client task send the seek request
-            Client.Send_Request;
-
-            -- Wait until the client either 1/Is waiting for the server to fulfill the seek request, or 2/Has failed to wait
-            while Stream.Clients_Waiting_For_Seek = 0 and then not Request_Sent loop
-               delay 0.001;
-            end loop;
-
-            -- Have our server task process the seek request, then check that client execution was resumed properly
             select
+               -- Give our tasks 1s to seek the stream
+               delay 1.0;
+               Fail_Test ("Client or server hung during stream seek request");
+            then abort
+               -- Have our client task send the seek request
+               Client.Send_Request;
+
+               -- Wait until the client either 1/Is waiting for the server to fulfill the seek request, or 2/Has failed to wait
+               while Stream.Clients_Waiting_For_Seek = 0 and then not Request_Sent loop
+                  delay 0.001;
+               end loop;
+
+               -- Have our server task process the seek request, then check that client execution was resumed properly
                Server.Process_Request;
-            or
-               delay 3.0;
-               abort Client, Server;
-               Fail_Test ("Server task hung during stream seek request");
-            end select;
-            select
                Client.Wait_For_Completion;
-            or
-               delay 3.0;
-               abort Client, Server;
-               Fail_Test ("Client task hung or crashed during stream seek request");
             end select;
          end;
 
@@ -459,28 +453,22 @@ package body Emulator_Kit.Memory.Byte_Streams is
                   Debug.Task_Message_Unhandled_Exception (Occurrence);
             end Server;
          begin
-            -- Have our server raise an exception
-            Server.Send_Exception;
-
-            -- Wait until the server either 1/Is waiting for the client to fetch the exception, or 2/Has failed to wait
-            while Stream.Servers_Waiting_For_Exception_Fetch = 0 and then not Exception_Notified loop
-               delay 0.001;
-            end loop;
-
-            -- Have our client task process the exception, then check that server execution was resumed properly
             select
+               -- Give our tasks 1s to process the exception
+               delay 1.0;
+               Fail_Test ("Client or server hung during stream exception handling");
+            then abort
+               -- Have our server raise an exception
+               Server.Send_Exception;
+
+               -- Wait until the server either 1/Is waiting for the client to fetch the exception, or 2/Has failed to wait
+               while Stream.Servers_Waiting_For_Exception_Fetch = 0 and then not Exception_Notified loop
+                  delay 0.001;
+               end loop;
+
+               -- Have our client task process the exception, then check that server execution was resumed properly
                Client.Fetch_Exception;
-            or
-               delay 3.0;
-               abort Client, Server;
-               Fail_Test ("Client task hung during exception processing");
-            end select;
-            select
                Server.Wait_For_Completion;
-            or
-               delay 3.0;
-               abort Client, Server;
-               Fail_Test ("Server task hung or crashed during exception processing");
             end select;
          end;
 
@@ -547,18 +535,12 @@ package body Emulator_Kit.Memory.Byte_Streams is
             end Server;
          begin
             select
+               -- Give our tasks 1s to process the exceptions
+               delay 1.0;
+               Fail_Test ("Client or server hung during stream exception handling");
+            then abort
                Client.Wait_For_Completion;
-            or
-               delay 3.0;
-               abort Client, Server;
-               Fail_Test ("Client task hung or crashed during exception processing");
-            end select;
-            select
                Server.Wait_For_Completion;
-            or
-               delay 3.0;
-               abort Client, Server;
-               Fail_Test ("Server task hung or crashed during exception processing");
             end select;
          end;
       end Test_Byte_Stream;
