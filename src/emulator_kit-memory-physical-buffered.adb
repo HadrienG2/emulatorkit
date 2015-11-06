@@ -484,7 +484,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
       use Emulator_Kit.Debug.Test;
 
       procedure Test_Buffer_Memory is
-         Buffer_Mem : Buffer_Memory (4 * 1024);
+         Buffer_Mem : Buffer_Memory (256);
          Advertised_Size : Universal_Size;
       begin
          Buffer_Mem.Get_Size (Advertised_Size);

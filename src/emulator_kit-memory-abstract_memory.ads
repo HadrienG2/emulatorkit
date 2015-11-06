@@ -95,8 +95,8 @@ package Emulator_Kit.Memory.Abstract_Memory is
    -- An instance which validates all of these properties should pass the following set of unit tests, assuming that...
    --    * The test runner has been properly set up for the instance's host package
    --    * The instance's Get_Size method is correct (interface tests cannot check it !)
-   --    * The instance has enough memory (current minimum : 128 bytes)
-   --    * It is safe to write everywhere within the instance's adress space (e.g. instance does not map to full host memory)
+   --    * The instance has enough memory (current minimum : 128 bytes, recommended : 256 bytes)
+   --    * It is safe to write everywhere within the instance's adress space (e.g. instance does not map to the full host memory)
    procedure Test_Instance (Instance : in out Memory_Interface'Class);
 
 end Emulator_Kit.Memory.Abstract_Memory;
