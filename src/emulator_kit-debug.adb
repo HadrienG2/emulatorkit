@@ -35,7 +35,7 @@ package body Emulator_Kit.Debug is
    begin
       Task_Message ("Unhandled exception of type " &
                       Ada.Exceptions.Exception_Name (Occurrence) & ", with message """ &
-                      Ada.Exceptions.Exception_Message (Occurrence) & """ ! Aborting...");
+                      Ada.Exceptions.Exception_Message (Occurrence) & """. Aborting...");
    end Task_Message_Unhandled_Exception;
 
 end Emulator_Kit.Debug;

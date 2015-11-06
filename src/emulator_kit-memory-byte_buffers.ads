@@ -17,7 +17,7 @@
 
 with Emulator_Kit.Data_Types;
 with Emulator_Kit.Memory.Physical;
-with Emulator_Kit.Tasking.Shared_Resources;
+with Emulator_Kit.Tasking.Shared_Resources; pragma Elaborate_All (Emulator_Kit.Tasking.Shared_Resources);
 
 -- This package defines buffers of bytes, intended as a place to store memory into
 package Emulator_Kit.Memory.Byte_Buffers is

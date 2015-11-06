@@ -1,8 +1,8 @@
 with Emulator_Kit.Debug.Test;
 
-package body Emulator_Kit.Memory.Abstract_Memory.Unit_Tests is
+package body Emulator_Kit.Memory.Abstract_Memory is
 
-   procedure Instance_Tests (Instance : in out Memory_Interface'Class) is
+   procedure Test_Instance (Instance : in out Memory_Interface'Class) is
       use Emulator_Kit.Debug.Test;
       use type Universal_Size;
       Instance_Size : Universal_Size;
@@ -398,9 +398,41 @@ package body Emulator_Kit.Memory.Abstract_Memory.Unit_Tests is
          end;
       end;
 
-      -- TODO : Test asynchronous byte transfers
+      -- Test memory transfers between host and guest memory
+      declare
+         use type Byte_Buffers.Byte_Buffer, Byte_Buffers.Byte_Buffer_Index;
+         Input : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Min_Index => 3,
+                                                                               Max_Index => Byte_Buffer_Size (Instance_Size + 2));
+      begin
+         -- Initialize an input buffer that is as large as guest memory
+         for I in Input.Target.all'Range loop
+            Input.Target.all (I) := Data_Types.Byte ((3 * I + 1) mod 256);
+         end loop;
+
+         -- Try to send it to guest memory and fetch it back
+         -- TODO : Add extra checks to ensure that if the memory task hangs, we won't hang too
+         declare
+            Copy_Process_Handle : Process_Handle;
+            Output : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Min_Index => 5,
+                                                                                   Max_Index => Byte_Buffer_Size (Instance_Size + 4));
+         begin
+            Instance.Start_Copy (Input           => Input,
+                                 Output_Location => 0,
+                                 Byte_Count      => Instance_Size,
+                                 Process         => Copy_Process_Handle);
+            Copy_Process_Handle.Target.Wait_For_Completion;
+            Instance.Start_Copy (Input_Location => 0,
+                                 Output         => Output,
+                                 Byte_Count     => Instance_Size,
+                                 Process        => Copy_Process_Handle);
+            Copy_Process_Handle.Target.Wait_For_Completion;
+            Test_Element_Property (Input.Target.all = Output.Target.all, "Full-memory copies should work");
+         end;
+      end;
+      -- TODO : Test memory transfers within guest memory
+
       -- TODO : Test asynchronous byte streams
       Fail_Test ("This test suite is not extensive enough yet");
-   end Instance_Tests;
+   end Test_Instance;
 
-end Emulator_Kit.Memory.Abstract_Memory.Unit_Tests;
+end Emulator_Kit.Memory.Abstract_Memory;

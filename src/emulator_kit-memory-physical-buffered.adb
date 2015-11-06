@@ -16,8 +16,7 @@
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
 with Emulator_Kit.Debug;
-with Emulator_Kit.Debug.Test;
-with Emulator_Kit.Memory.Physical.Buffered.Unit_Tests;
+with Emulator_Kit.Debug.Test; pragma Elaborate_All (Emulator_Kit.Debug.Test);
 
 package body Emulator_Kit.Memory.Physical.Buffered is
 
@@ -481,9 +480,29 @@ package body Emulator_Kit.Memory.Physical.Buffered is
          raise;
    end Buffer_Memory;
 
+   procedure Run_Tests is
+      use Emulator_Kit.Debug.Test;
+
+      procedure Test_Buffer_Memory is
+         Buffer_Mem : Buffer_Memory (256); -- This amount of memory makes for nice test patterns
+         Advertised_Size : Universal_Size;
+      begin
+         Buffer_Mem.Get_Size (Advertised_Size);
+         Test_Element_Property (Advertised_Size = Universal_Size (Buffer_Mem.Buffer_Size), "Buffer memory should advertise the right size");
+         Abstract_Memory.Test_Instance (Buffer_Mem);
+      end Test_Buffer_Memory;
+
+      procedure Test_Buffered_Package is
+      begin
+         Test_Package_Element (To_Entity_Name ("Buffer_Memory"), Test_Buffer_Memory'Access);
+      end Test_Buffered_Package;
+   begin
+      Test_Package (To_Entity_Name ("Memory.Physical.Buffered"), Test_Buffered_Package'Access);
+   end Run_Tests;
+
 begin
 
    -- Automatically test the package when it is included
-   Debug.Test.Elaboration_Self_Test (Unit_Tests.Run_Tests'Access);
+   Debug.Test.Elaboration_Self_Test (Run_Tests'Access);
 
 end Emulator_Kit.Memory.Physical.Buffered;

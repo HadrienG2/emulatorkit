@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
+with Emulator_Kit.Debug; pragma Elaborate_All (Emulator_Kit.Debug);
+
 package body Emulator_Kit.Debug.Test is
 
    use type Entity_Name;

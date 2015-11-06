@@ -92,4 +92,11 @@ package Emulator_Kit.Memory.Abstract_Memory is
                             Stream_Chunk_Size : Byte_Buffer_Size;
                             Stream : out Byte_Stream_Handle) is abstract;
 
+   -- An instance which validates all of these properties should pass the following set of unit tests, assuming that...
+   --    * The test runner is properly set up for the instance's host package
+   --    * The instance's Get_Size method functions properly (interface tests cannot check it !)
+   --    * The instance has enough memory (current minimum : 128 bytes)
+   --    * It is safe to write at the beginning and the end of the instance's adress space
+   procedure Test_Instance (Instance : in out Memory_Interface'Class);
+
 end Emulator_Kit.Memory.Abstract_Memory;

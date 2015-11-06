@@ -16,7 +16,7 @@
 -- along with EmulatorKit.  If not, see <http://www.gnu.org/licenses/>.
 
 with Ada.Exceptions;
-with Emulator_Kit.Tasking.Shared_Resources;
+with Emulator_Kit.Tasking.Shared_Resources; pragma Elaborate_All (Emulator_Kit.Tasking.Shared_Resources);
 
 -- This package sets up a basic interface to ongoing asynchronous processes
 package Emulator_Kit.Tasking.Processes is
