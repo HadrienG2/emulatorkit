@@ -213,6 +213,11 @@ package body Emulator_Kit.Memory.Physical.Buffered is
          begin
 
             select
+               -- Size query
+               accept Get_Size (Size_In_Bytes : out Universal_Size) do
+                  Size_In_Bytes := Universal_Size (Buffer_Size);
+               end Get_Size;
+            or
                -- Synchronous write instructions...
                accept Write (Input : Data_Types.Byte; Output_Location : Universal_Address) do
                   declare

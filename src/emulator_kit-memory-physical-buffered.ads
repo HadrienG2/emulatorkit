@@ -33,6 +33,9 @@ package Emulator_Kit.Memory.Physical.Buffered is
    -- Then comes the buffer-based physical memory implementation
    task type Buffer_Memory (Buffer_Size : Byte_Buffer_Size) is new Abstract_Memory.Memory_Interface with
 
+      -- Size query
+      overriding entry Get_Size (Size_In_Bytes : out Universal_Size);
+
       -- Element-wise primitive data write
       overriding entry Write (Input : Data_Types.Byte; Output_Location : Universal_Address);
       overriding entry Write (Input : Data_Types.Word; Output_Location : Universal_Address);

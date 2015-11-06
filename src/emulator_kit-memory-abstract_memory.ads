@@ -34,6 +34,9 @@ package Emulator_Kit.Memory.Abstract_Memory is
    -- We propose that memory objects be implemented as tasks, as this allows for asynchronous data transfers.
    type Memory_Interface is task interface;
 
+   -- It should be possible to probe the size of any implementation, as this helps for unit testing on the interface
+   procedure Get_Size (Object : Memory_Interface; Size_In_Bytes : out Universal_Size) is abstract;
+
    -- The simplest memory interface that we can propose is a way to synchronously write standard x86_64 data types from variables...
    procedure Write (Target : in out Memory_Interface; Input : Data_Types.Byte; Output_Location : Universal_Address) is abstract;
    procedure Write (Target : in out Memory_Interface; Input : Data_Types.Word; Output_Location : Universal_Address) is abstract;
