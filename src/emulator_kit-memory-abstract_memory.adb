@@ -412,7 +412,8 @@ package body Emulator_Kit.Memory.Abstract_Memory is
 
       -- Test asynchronous memory transfers
       declare
-         use type Byte_Buffers.Byte_Buffer, Byte_Buffers.Byte_Buffer_Index;
+         subtype Byte_Buffer_Index is Byte_Buffers.Byte_Buffer_Index;
+         use type Byte_Buffers.Byte_Buffer, Byte_Buffer_Index;
          Input : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Min_Index => 3,
                                                                                Max_Index => Byte_Buffer_Size (Instance_Size + 2));
          Copy_Process_Handle : Process_Handle;
@@ -491,7 +492,6 @@ package body Emulator_Kit.Memory.Abstract_Memory is
 
          -- Test internal memory transfers
          declare
-            subtype Byte_Buffer_Index is Byte_Buffers.Byte_Buffer_Index;
             Half_Of_Memory : constant Universal_Size := Instance_Size / 2;
             Destination : constant Universal_Address := Universal_Address (Half_Of_Memory);
             Output : constant Byte_Buffer_Handle := Byte_Buffers.Make_Byte_Buffer (Byte_Buffer_Size (Half_Of_Memory));
@@ -520,10 +520,76 @@ package body Emulator_Kit.Memory.Abstract_Memory is
             Test_Element_Property (Input.Target (First_Input_Index .. First_Input_Index + Byte_Buffer_Size (Half_Of_Memory) - 1) = Output.Target.all,
                                    "Internal memory copies should work as expected");
          end;
-      end;
 
-      -- TODO : Test asynchronous byte streams
-      Fail_Test ("This test suite is not extensive enough yet");
+         -- Reinitialize our input buffer with a new byte pattern
+         for I in Input.Target'Range loop
+            Input.Target (I) := Data_Types.Byte ((5 * I + 3) mod 256);
+         end loop;
+
+         -- Test asynchronous byte streams
+         declare
+            subtype Byte_Buffer is Byte_Buffers.Byte_Buffer;
+            Stream_Handle : Byte_Stream_Handle;
+            Stream_Chunk_Size : constant Byte_Buffer_Size := Byte_Buffer_Size (Instance_Size / 4);
+            Output : Byte_Buffer (9 .. Byte_Buffer_Size (Instance_Size + 8));
+         begin
+            -- This test assumes that the instance size is a multiple of 4. Check this assumption.
+            if Instance_Size mod 4 /= 0 then
+               Fail_Test ("This test makes the assumption that memory size is a multiple of 4, which is not the case here");
+            end if;
+
+            -- Try to transfer the input data into the memory, and then back to the output, using memory streams
+            select
+               -- Give our tasks one second to perform the memory copies
+               delay 1.0;
+               Fail_Test ("Streamed memory copies are taking too long, memory manager probably hung");
+            then abort
+               -- Open a writing stream at the beginning of memory
+               Instance.Start_Writing (Output_Location   => 0,
+                                       Stream_Chunk_Size => Stream_Chunk_Size,
+                                       Stream            => Stream_Handle);
+
+               -- Send our input through the writing stream
+               declare
+                  Input_Location : Byte_Buffer_Index := Input.Target'First;
+               begin
+                  while Input_Location <= Input.Target'Last loop
+                     Stream_Handle.Target.Write_Data_Chunk (Input.Target.all, Input_Location);
+                     Input_Location := Input_Location + Stream_Chunk_Size;
+                  end loop;
+               end;
+
+               -- Check that very shortly after the last write has been commited, we are considered to be at the end of the stream
+               -- (we should be, because we wrote through all of memory)
+               Stream_Handle.Target.Flush;
+               delay 0.005;
+               Test_Element_Property (Stream_Handle.Target.At_End, "We should be at the end of the stream after writing through all memory");
+
+               -- Next, open a reading stream at the beginning of memory
+               Instance.Start_Reading (Input_Location    => 0,
+                                       Stream_Chunk_Size => Stream_Chunk_Size,
+                                       Stream            => Stream_Handle);
+
+               -- Fetch our output through the reading stream
+               declare
+                  Output_Location : Byte_Buffer_Index := Output'First;
+               begin
+                  loop
+                     Stream_Handle.Target.Read_Data_Chunk (Output, Output_Location);
+                     Output_Location := Output_Location + Stream_Chunk_Size;
+                  end loop;
+               exception
+                  when Byte_Streams.Reached_Stream_End => null;
+               end;
+            end select;
+
+            -- Check that the basic streamed copy went well
+            Test_Element_Property (Input.Target.all = Output, "Streamed memory copies should work as expected");
+
+            -- TODO : Test seek requests : seeking within a stream, and stopping an incomplete stream
+            Fail_Test ("This test suite is missing seek request tests");
+         end;
+      end;
    end Test_Instance;
 
 end Emulator_Kit.Memory.Abstract_Memory;
