@@ -361,8 +361,14 @@ package body Emulator_Kit.Memory.Abstract_Memory is
       begin
          -- At the beginning of memory
          declare
-            Input : constant Float_Extended_Buffer (1 .. 2) := ((Fraction => 16#1691_6533_ABC2_6513#, Integer_Bit => False, Exponent => 16#2568#, Sign_Bit => True),
-                                                                (Fraction => 16#7615_6161_6135_2137#, Integer_Bit => False, Exponent => 16#5313#, Sign_Bit => False));
+            Input : constant Float_Extended_Buffer (1 .. 2) := ((Fraction => 16#1691_6533_ABC2_6513#,
+                                                                 Integer_Bit => False,
+                                                                 Biased_Exponent => 2#0101101_00110101#,
+                                                                 Sign_Bit => True),
+                                                                (Fraction => 16#7615_6161_6135_2137#,
+                                                                 Integer_Bit => False,
+                                                                 Biased_Exponent => 2#1111001_01010101#,
+                                                                 Sign_Bit => False));
          begin
             Instance.Write (Input (1), 0);
             Instance.Write (Input (2), 16);
@@ -373,8 +379,14 @@ package body Emulator_Kit.Memory.Abstract_Memory is
 
          -- At the end of memory (including out of bounds)
          declare
-            Input : constant Float_Extended_Buffer (1 .. 2) := ((Fraction => 16#7496_1616_1312_4163#, Integer_Bit => False, Exponent => 16#6414#, Sign_Bit => True),
-                                                                (Fraction => 16#3156_3161_4651_6514#, Integer_Bit => False, Exponent => 16#3541#, Sign_Bit => False));
+            Input : constant Float_Extended_Buffer (1 .. 2) := ((Fraction => 16#7496_1616_1312_4163#,
+                                                                 Integer_Bit => False,
+                                                                 Biased_Exponent => 2#0101011_01011010#,
+                                                                 Sign_Bit => True),
+                                                                (Fraction => 16#3156_3161_4651_6514#,
+                                                                 Integer_Bit => False,
+                                                                 Biased_Exponent => 2#1010110_10111011#,
+                                                                 Sign_Bit => False));
          begin
             Instance.Write (Input (1), Universal_Address (Instance_Size - 16));
             Instance.Write (Input (2), Universal_Address (Instance_Size - 32));
@@ -407,7 +419,7 @@ package body Emulator_Kit.Memory.Abstract_Memory is
       begin
          -- Initialize a shared input buffer that is as large as guest memory
          for I in Input.Target'Range loop
-            Input.Target (I) := Data_Types.Byte ((3 * I + 1) mod 256);
+            Input.Target (I) := Data_Types.Byte ((5 * I + 1) mod 256);
          end loop;
 
          -- Try to send it to guest memory and fetch it back

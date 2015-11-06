@@ -41,12 +41,12 @@ package Emulator_Kit.Data_Types is
    -- x86_64's extended-precision floating point type must be interpreted as a record
    type Float_Extended_Fraction is mod 2 ** 63;
    type Float_Extended_Biased_Exponent is mod 2 ** 15;
-   Float_Extended_Exponent_Bias : constant := -16383;
+   Float_Extended_Exponent_Bias : constant := -16382;
    type Float_Extended is
       record
          Fraction : Float_Extended_Fraction;
          Integer_Bit : Boolean;
-         Exponent : Float_Extended_Biased_Exponent;
+         Biased_Exponent : Float_Extended_Biased_Exponent;
          Sign_Bit : Boolean;
       end record;
    for Float_Extended'Size use 16 * Byte_Size; -- An extended-precision float is 80 bits aka 10 bytes, but these are best 16 bytes aligned.
@@ -56,7 +56,7 @@ package Emulator_Kit.Data_Types is
       record
          Fraction at 0 range 0 .. 62;
          Integer_Bit at 0 range 63 .. 63;
-         Exponent at 8 range 0 .. 14;
+         Biased_Exponent at 8 range 0 .. 14;
          Sign_Bit at 8 range 15 .. 15;
       end record;
 

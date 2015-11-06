@@ -585,7 +585,7 @@ package body Emulator_Kit.Memory.Byte_Buffers is
             declare
                Input : aliased constant Float_Extended := (Fraction => 2#0101101_11001011_00111100_11011111_11011101_11101110_10100110_10101101#,
                                                            Integer_Bit => False,
-                                                           Exponent => 2#1101101_00110101#,
+                                                           Biased_Exponent => 2#0101101_00110101#,
                                                            Sign_Bit => True);
                Bytes : constant Byte_Buffer (0 .. 9) := (2#10101101#, -- Fraction least significant byte
                                                          2#10100110#,
@@ -596,7 +596,7 @@ package body Emulator_Kit.Memory.Byte_Buffers is
                                                          2#11001011#,
                                                          2#0_0101101#, -- Integer bit + last 7 bits of fraction
                                                          2#00110101#, -- First exponent byte
-                                                         2#1_1101101#); -- Sign bit + last 7 bits of exponent
+                                                         2#1_0101101#); -- Sign bit + last 7 bits of exponent
             begin
                Unchecked_Write (Buffer, 117, Input);
                Test_Element_Property (Buffer = Bytes & (42, 42), "Writing extended-precision floats at the beginning of byte buffers should work");
@@ -609,7 +609,7 @@ package body Emulator_Kit.Memory.Byte_Buffers is
             declare
                Input : aliased constant Float_Extended := (Fraction => 2#1010101_00101110_11011100_00111010_10011110_11101101_01010101_10101010#,
                                                            Integer_Bit => False,
-                                                           Exponent => 2#1111001_01010101#,
+                                                           Biased_Exponent => 2#1111001_01010101#,
                                                            Sign_Bit => False);
                Bytes : constant Byte_Buffer (0 .. 9) := (2#10101010#, -- Fraction least significant byte
                                                          2#01010101#,
