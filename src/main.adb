@@ -126,6 +126,7 @@ begin
                   Offset := Offset + Chunk_Buffer'Length;
                   Stream_Handle.Target.Write_Data_Chunk (Chunk_Buffer, Chunk_Buffer'First);
                end loop;
+               Stream_Handle.Target.Flush;
             end;
 
             Text_IO.Put_Line ("Performing an internal memory copy...");

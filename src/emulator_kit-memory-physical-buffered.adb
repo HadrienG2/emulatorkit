@@ -149,6 +149,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
          -- A streaming task basically performs its duty until it reaches the end of memory or is interrupted
          declare
             Request : Byte_Streams.Stream_Request;
+            Stop_Requested : Boolean := False;
             Last_Buffer_Index : constant Byte_Buffer_Index := Internal_Buffer'Last - Chunk_Size + 1;
          begin
             Stream_Loop :
@@ -169,6 +170,7 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                         Stream_Handle.Target.Notify_Seek_Completion;
 
                      when Byte_Streams.Stop =>
+                        Stop_Requested := True;
                         exit Stream_Loop;
 
                   end case;
@@ -176,24 +178,33 @@ package body Emulator_Kit.Memory.Physical.Buffered is
                   -- Otherwise, continuously stream data until the end of memory is reached
                   case Mode is
                      when Read_From_Memory =>
-                        while Buffer_Index < Last_Buffer_Index loop
+                        while Buffer_Index <= Last_Buffer_Index loop
                            Stream_Handle.Target.Write_Data_Chunk (Internal_Buffer.all, Buffer_Index);
                            Buffer_Index := Buffer_Index + Chunk_Size;
                         end loop;
-                        Stream_Handle.Target.Write_Data_Chunk (Internal_Buffer.all, Last_Buffer_Index);
                      when Write_To_Memory =>
-                        while Buffer_Index < Last_Buffer_Index loop
+                        while Buffer_Index <= Last_Buffer_Index loop
                            Stream_Handle.Target.Read_Data_Chunk (Internal_Buffer.all, Buffer_Index);
                            Buffer_Index := Buffer_Index + Chunk_Size;
                         end loop;
-                        Stream_Handle.Target.Read_Data_Chunk (Internal_Buffer.all, Last_Buffer_Index);
                   end case;
                   exit Stream_Loop;
                end select;
             end loop Stream_Loop;
+
+            -- Do not forget to flush any pending stream write after a client has requested the stream to stop
+            -- (NOTE : This snippet is needed for correctness, but don't bother trying to cover it by unit testing unless
+            --     1/You are REALLY good at triggering race conditions
+            --     2/You are running some combination of real time OS + Ada runtime that has excellent support for asynchronous transfers of control)
+            if Stop_Requested and then Mode = Write_To_Memory then
+               while Buffer_Index <= Last_Buffer_Index and then Stream_Handle.Target.Available_Data /= 0 loop
+                  Stream_Handle.Target.Read_Data_Chunk (Internal_Buffer.all, Buffer_Index);
+                  Buffer_Index := Buffer_Index + Chunk_Size;
+               end loop;
+            end if;
          end;
 
-         -- Notify the client of the stream's completion.
+         -- Notify the client that the stream has reached completion.
          Stream_Handle.Target.Notify_Stream_End;
       exception
          when Occurrence : others =>

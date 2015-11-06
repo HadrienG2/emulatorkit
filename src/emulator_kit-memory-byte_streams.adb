@@ -61,6 +61,19 @@ package body Emulator_Kit.Memory.Byte_Streams is
          Write_Pointer := (Write_End + 1) mod Ring_Buffer'Length;
       end Write_Data_Chunk;
 
+      entry Flush when Available_Data = 0 or else Stream_End_Reached or else Exception_Pending is
+      begin
+         -- If a client exception is pending, raise it
+         if Exception_Pending then
+            Fetch_Exception;
+         end if;
+
+         -- If attempting to flush a closed stream, raise an exception
+         if Stream_End_Reached then
+            raise Reached_Stream_End;
+         end if;
+      end Flush;
+
       function Available_Data return Byte_Buffer_Size is ((Write_Pointer - Read_Pointer) mod Ring_Buffer'Length);
 
       entry Read_Data_Chunk (Output : out Byte_Buffer; Output_Index : Byte_Buffer_Index)
@@ -223,12 +236,23 @@ package body Emulator_Kit.Memory.Byte_Streams is
                null;
             end select;
             select
+               Stream.Flush;
+               Fail_Test ("Flushing should block when there is pending data in the stream");
+            else
+               null;
+            end select;
+            select
                Stream.Read_Data_Chunk (Output, Output'First);
                Test_Element_Property (Stream.Available_Storage = 1, "Stream storage should increase after reading a byte");
                Test_Element_Property (Stream.Available_Data = 0, "Stream data should disappear after reading a bye");
                Test_Element_Property (Output (32) = 24, "Data should be transmitted correctly within a stream");
             else
                Fail_Test ("Stream reading should not block when data is available");
+            end select;
+            select
+               Stream.Flush;
+            else
+               Fail_Test ("Flushing should not block when there is pending no data in the stream");
             end select;
          end;
 
@@ -278,29 +302,45 @@ package body Emulator_Kit.Memory.Byte_Streams is
             end select;
          end;
 
-         -- Test normal stream termination
+         -- Test stream termination behavior
          declare
-            Stream : Byte_Stream (Buffer_Size => 1, Chunk_Size => 1);
+            Empty_Stream, Full_Stream : Byte_Stream (Buffer_Size => 1, Chunk_Size => 1);
             Input_Output : Byte_Buffer (32 .. 32) := (32 => 64);
          begin
-            Stream.Notify_Stream_End;
-            Test_Element_Property (Stream.At_End, "The client should be aware that a stream has reached its end");
+            -- On an empty stream
+            Empty_Stream.Notify_Stream_End;
+            Test_Element_Property (Empty_Stream.At_End, "The client should be aware that a stream has reached its end");
             begin
                select
-                  Stream.Read_Data_Chunk (Input_Output, Input_Output'First);
+                  Empty_Stream.Read_Data_Chunk (Input_Output, Input_Output'First);
                else
                   Fail_Test ("Reading from an empty stream should not block when the stream has reached its end");
                end select;
+               Fail_Test ("Reading from an empty stream should raise an exception when the stream has reached its end");
+            exception
+               when Reached_Stream_End => null;
+            end;
+
+            -- On a full stream
+            Full_Stream.Write_Data_Chunk (Input_Output, Input_Output'First);
+            Full_Stream.Notify_Stream_End;
+            begin
+               select
+                  Full_Stream.Write_Data_Chunk (Input_Output, Input_Output'First);
+               else
+                  Fail_Test ("Writing to a full stream should not block when the stream has reached its end");
+               end select;
+               Fail_Test ("Writing to a full stream should raise an exception when the stream has reached its end");
             exception
                when Reached_Stream_End => null;
             end;
             begin
-               Stream.Write_Data_Chunk (Input_Output, Input_Output'First);
                select
-                  Stream.Write_Data_Chunk (Input_Output, Input_Output'First);
+                  Full_Stream.Flush;
                else
-                  Fail_Test ("Writing to a full stream should not block when the stream has reached its end");
+                  Fail_Test ("Flushing a full stream should not block when the stream has reached its end");
                end select;
+               Fail_Test ("Flushing a full stream should raise an exception when the stream has reached its end");
             exception
                when Reached_Stream_End => null;
             end;
@@ -505,6 +545,12 @@ package body Emulator_Kit.Memory.Byte_Streams is
                   when Stupid_Exception => null;
                end;
                begin
+                  Stream.Flush;
+                  Fail_Test ("Client flushes should fetch pending exceptions");
+               exception
+                  when Stupid_Exception => null;
+               end;
+               begin
                   Stream.Request_Seek (16#BADC0DE#);
                   Fail_Test ("Client seeks should propagate pending exceptions");
                exception
@@ -526,6 +572,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
                   raise Stupid_Exception with "Failure is the only option !";
                exception
                   when Occurrence : Stupid_Exception =>
+                     Stream.Notify_Exception (Occurrence);
                      Stream.Notify_Exception (Occurrence);
                      Stream.Notify_Exception (Occurrence);
                      Stream.Wait_For_Request (Seek_Request);

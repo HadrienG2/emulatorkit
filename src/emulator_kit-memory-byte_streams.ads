@@ -47,11 +47,12 @@ package Emulator_Kit.Memory.Byte_Streams is
    protected type Byte_Stream (Buffer_Size : Byte_Buffer_Size; Chunk_Size : Byte_Buffer_Size) is  -- DEBUG : This works
 
       -- Common interface for everyone involved
-      procedure Invalidate_Buffer;
+      procedure Invalidate_Buffer; -- Clear the contents of the internal stream buffer
 
       -- Data sender interface
       function Available_Storage return Byte_Buffer_Size;
       entry Write_Data_Chunk (Input : Byte_Buffer; Input_Index : Byte_Buffer_Index);
+      entry Flush; -- Wait for all the previously written data to be read by the recipient
 
       -- Data recipient interface
       function Available_Data return Byte_Buffer_Size;
