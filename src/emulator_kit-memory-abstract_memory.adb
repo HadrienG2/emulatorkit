@@ -417,7 +417,7 @@ package body Emulator_Kit.Memory.Abstract_Memory is
          begin
             -- Try to round trip our input buffer between host and guest
             select
-               -- Give our tasks 1s to perform the memory copy
+               -- Give our tasks one second to perform the memory copies
                delay 1.0;
                Fail_Test ("Memory copies are taking too long, memory manager probably hung");
             then abort
@@ -487,7 +487,7 @@ package body Emulator_Kit.Memory.Abstract_Memory is
          begin
             -- Copy the first half of memory to its second half
             select
-               -- Give our tasks 1s to perform the memory copy
+               -- Give our tasks one second to perform the memory copies
                delay 1.0;
                Fail_Test ("Memory copies are taking too long, memory manager probably hung");
             then abort

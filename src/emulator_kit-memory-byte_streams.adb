@@ -378,7 +378,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             end Server;
          begin
             select
-               -- Give our tasks 1s to seek the stream
+               -- Give our tasks one second to seek the stream
                delay 1.0;
                Fail_Test ("Client or server hung during stream seek request");
             then abort
@@ -454,7 +454,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             end Server;
          begin
             select
-               -- Give our tasks 1s to process the exception
+               -- Give our tasks one second to process the exception
                delay 1.0;
                Fail_Test ("Client or server hung during stream exception handling");
             then abort
@@ -535,7 +535,7 @@ package body Emulator_Kit.Memory.Byte_Streams is
             end Server;
          begin
             select
-               -- Give our tasks 1s to process the exceptions
+               -- Give our tasks one second to process all exceptions
                delay 1.0;
                Fail_Test ("Client or server hung during stream exception handling");
             then abort
