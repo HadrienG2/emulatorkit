@@ -17,7 +17,6 @@
 
 with Emulator_Kit.Data_Types;
 with Emulator_Kit.Memory.Byte_Buffers;
-with Emulator_Kit.Memory.Byte_Streams;
 with Emulator_Kit.Tasking.Processes;
 
 -- There are many things that may act as memory in an x86 emulator : a simple buffer of bytes, the emulator host's memory,
@@ -28,7 +27,6 @@ package Emulator_Kit.Memory.Abstract_Memory is
    -- First, let's define few shortcuts to make code more readable
    subtype Byte_Buffer_Handle is Memory.Byte_Buffers.Byte_Buffer_Handle;
    subtype Byte_Buffer_Size is Memory.Byte_Buffers.Byte_Buffer_Size;
-   subtype Byte_Stream_Handle is Memory.Byte_Streams.Byte_Stream_Handle;
    subtype Process_Handle is Tasking.Processes.Process_Handle;
 
    -- We propose that memory objects be implemented as tasks, as this allows for asynchronous data transfers.

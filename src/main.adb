@@ -30,7 +30,6 @@ with Emulator_Kit.Debug.Test;
 with Emulator_Kit.Memory;
 with Emulator_Kit.Memory.Abstract_Memory;
 with Emulator_Kit.Memory.Byte_Buffers;
-with Emulator_Kit.Memory.Byte_Streams;
 with Emulator_Kit.Memory.Physical;
 with Emulator_Kit.Memory.Physical.Buffered;
 with Emulator_Kit.Tasking;
@@ -53,8 +52,7 @@ procedure Main is
    Emulated_Memory : Memory.Physical.Buffered.Buffer_Memory (Mem_Size);
    Buffer_Handle : constant Byte_Buffer_Handle := Memory.Byte_Buffers.Make_Byte_Buffer (Mem_Size);
 
-   -- This sample program allows one to compare the same task (filling 2GB of RAM, copying the first GB to the second GB, and fetching the result back)
-   -- being performed using buffers and streams. On my machine, the stream version runs about 30% faster due to its extra concurrency.
+   -- Set this mode to Buffer in order to test a memory copy
    type Mode is (Buffer, No_Op);
    Active_Mode : constant Mode := No_Op;
 
