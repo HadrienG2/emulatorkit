@@ -72,14 +72,6 @@ package Emulator_Kit.Memory.Physical.Buffered is
                                    Byte_Count : Universal_Size;
                                    Process : out Process_Handle);
 
-      -- Asynchronous memory streaming to/from some address onwards
-      overriding entry Start_Reading (Input_Location : Universal_Address;
-                                      Stream_Chunk_Size : Byte_Buffer_Size;
-                                      Stream : out Byte_Stream_Handle);
-      overriding entry Start_Writing (Output_Location : Universal_Address;
-                                      Stream_Chunk_Size : Byte_Buffer_Size;
-                                      Stream : out Byte_Stream_Handle);
-
    end Buffer_Memory;
 
 end Emulator_Kit.Memory.Physical.Buffered;

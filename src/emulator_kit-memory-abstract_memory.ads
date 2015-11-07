@@ -79,19 +79,6 @@ package Emulator_Kit.Memory.Abstract_Memory is
                          Byte_Count : Universal_Size;
                          Process : out Process_Handle) is abstract;
 
-   -- When the amount of requested data is unknown, or if the data must be processed before reads or writes as in instruction fetches,
-   -- it can also be useful to continuously stream data from someplace.
-   --
-   -- A chunk size of 4096 provides a fairly good compromise between performance and memory size for large data transfers.
-   procedure Start_Reading (Source : Memory_Interface;
-                            Input_Location : Universal_Address;
-                            Stream_Chunk_Size : Byte_Buffer_Size;
-                            Stream : out Byte_Stream_Handle) is abstract;
-   procedure Start_Writing (Target : in out Memory_Interface;
-                            Output_Location : Universal_Address;
-                            Stream_Chunk_Size : Byte_Buffer_Size;
-                            Stream : out Byte_Stream_Handle) is abstract;
-
    -- An instance which validates all of these properties should pass the following set of unit tests, assuming that...
    --    * The test runner has been properly set up for the instance's host package
    --    * The instance's Get_Size method is correct (interface tests cannot check it !)
