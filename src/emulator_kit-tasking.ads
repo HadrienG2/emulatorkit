@@ -28,9 +28,4 @@ package Emulator_Kit.Tasking is
    function Exception_Pending (Target : Exception_Channel) return Boolean is abstract;
    procedure Fetch_Exception (Target : in out Exception_Channel) is abstract;  -- Trigger an exception if one is active, otherwise nothing happens
 
-   -- A synchronous exception channel is very much like a regular exception channel, except the server promises to wait for the client to fetch the exception.
-   -- On these communication channels, exceptions are not fatal, that is, they do not invalidate the communication channel. Once a client has fetched the exception,
-   -- the communication channel is reset to a valid state.
-   type Synchronous_Exception_Channel is protected interface and Exception_Channel;
-
 end Emulator_Kit.Tasking;
