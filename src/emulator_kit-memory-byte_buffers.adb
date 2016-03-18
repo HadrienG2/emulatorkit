@@ -76,62 +76,34 @@ package body Emulator_Kit.Memory.Byte_Buffers is
 
    procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : Data_Types.Float_Single) is
       type Byte_Access is access all Data_Types.Byte;
-      St0_Contents : Data_Types.Float_Single; -- See below
    begin
-      -- DEBUG : This asm statement is needlessly inefficient. It is made necessary by GNAT's apparent lack of support for x87 clobbers
-      System.Machine_Code.Asm (Template => "fstps (%2);",
-                               Outputs => Data_Types.Float_Single'Asm_Output ("=t", St0_Contents),
-                               Inputs => (Data_Types.Float_Single'Asm_Input ("0", Input),
+      System.Machine_Code.Asm (Template => "fstps (%1)",
+                               Inputs => (Data_Types.Float_Single'Asm_Input ("t", Input),
                                           Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
-                               Clobber => "memory",
+                               Clobber => "memory st",
                                Volatile => True);
-      -- DEBUG : This is the asm statement that would best match my intent, if it were legal
---        System.Machine_Code.Asm (Template => "fstps (%1)",
---                                 Inputs => (Data_Types.Float_Single'Asm_Input ("t", Input),
---                                            Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
---                                 Clobber => "memory st(0)",
---                                 Volatile => True);
    end Unchecked_Write;
 
    procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : Data_Types.Float_Double) is
       type Byte_Access is access all Data_Types.Byte;
-      St0_Contents : Data_Types.Float_Double; -- See below
    begin
-      -- DEBUG : This asm statement is needlessly inefficient. It is made necessary by GNAT's apparent lack of support for x87 clobbers
-      System.Machine_Code.Asm (Template => "fstpl (%2);",
-                               Outputs => Data_Types.Float_Double'Asm_Output ("=t", St0_Contents),
-                               Inputs => (Data_Types.Float_Double'Asm_Input ("0", Input),
+      System.Machine_Code.Asm (Template => "fstpl (%1)",
+                               Inputs => (Data_Types.Float_Double'Asm_Input ("t", Input),
                                           Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
-                               Clobber => "memory",
+                               Clobber => "memory st",
                                Volatile => True);
-      -- DEBUG : This is the asm statement that would best match my intent, if it were legal
---        System.Machine_Code.Asm (Template => "fstpl (%1)",
---                                 Inputs => (Data_Types.Float_Double'Asm_Input ("t", Input),
---                                            Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
---                                 Clobber => "memory st(0)",
---                                 Volatile => True);
    end Unchecked_Write;
 
    procedure Unchecked_Write (Buffer : in out Byte_Buffer; Location : Byte_Buffer_Index; Input : aliased Data_Types.Float_Extended) is
       type Byte_Access is access all Data_Types.Byte;
       type Float_Extended_Access_Const is access constant Data_Types.Float_Extended;
-      St0_Contents : Data_Types.Float_Double; -- See below
    begin
-      -- DEBUG : This asm statement is needlessly inefficient. It is made necessary by GNAT's apparent lack of support for x87 clobbers
-      System.Machine_Code.Asm (Template => "fldt (%1);" &
-                                           "fstpt (%2)",
-                               Outputs => Data_Types.Float_Double'Asm_Output ("=t", St0_Contents),
+      System.Machine_Code.Asm (Template => "fldt (%0);" &
+                                           "fstpt (%1)",
                                Inputs => (Float_Extended_Access_Const'Asm_Input ("r", Input'Access),
                                           Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
-                               Clobber => "memory",
+                               Clobber => "memory st",
                                Volatile => True);
-      -- DEBUG : This is the asm statement that would best match my intent, if it were legal
---        System.Machine_Code.Asm (Template => "fldt (%0);" &
---                                             "fstpt (%1)",
---                                 Inputs => (Data_Types.Float_Extended_Access_Const'Asm_Input ("r", Input),
---                                            Byte_Access'Asm_Input ("r", Buffer (Location)'Access)),
---                                 Clobber => "memory st(0)",
---                                 Volatile => True);
    end Unchecked_Write;
 
    procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : out Data_Types.Word) is
@@ -201,23 +173,13 @@ package body Emulator_Kit.Memory.Byte_Buffers is
    procedure Unchecked_Read (Buffer : Byte_Buffer; Location : Byte_Buffer_Index; Output : aliased out Data_Types.Float_Extended) is
       type Byte_Access_Const is access constant Data_Types.Byte;
       type Float_Extended_Access is access all Data_Types.Float_Extended;
-      St0_Contents : Data_Types.Float_Double; -- See below
    begin
-      -- DEBUG : This asm statement is needlessly inefficient. It is made necessary by GNAT's apparent lack of support for x87 clobbers
-      System.Machine_Code.Asm (Template => "fldt (%2);" &
-                                           "fstpt (%1)",
-                               Outputs => Data_Types.Float_Double'Asm_Output ("=t", St0_Contents),
+      System.Machine_Code.Asm (Template => "fldt (%1);" &
+                                           "fstpt (%0)",
                                Inputs => (Float_Extended_Access'Asm_Input ("r", Output'Access),
                                           Byte_Access_Const'Asm_Input ("r", Buffer (Location)'Access)),
-                               Clobber => "memory",
+                               Clobber => "memory st(1)",
                                Volatile => True);
-      -- DEBUG : This is the asm statement that would best match my intent, if it were legal
---        System.Machine_Code.Asm (Template => "fldt (%1);" &
---                                             "fstpt (%0)",
---                                 Inputs => (Data_Types.Float_Extended_Access'Asm_Input ("r", Output),
---                                            Byte_Access_Const'Asm_Input ("r", Buffer (Location)'Access)),
---                                 Clobber => "memory st(0)",
---                                 Volatile => True);
    end Unchecked_Read;
 
    procedure Run_Tests is

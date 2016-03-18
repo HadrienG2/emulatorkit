@@ -54,7 +54,7 @@ procedure Main is
 
    -- Set this mode to Buffer in order to test a memory copy
    type Mode is (Buffer, No_Op);
-   Active_Mode : constant Mode := No_Op;
+   Active_Mode : constant Mode := Buffer;
 
    function Gen_Byte (Index : Byte_Buffer_Index) return Data_Types.Byte is (Data_Types.Byte (Byte_Buffer_Index (Index - 1) * 256 / Mem_Size));
 begin
